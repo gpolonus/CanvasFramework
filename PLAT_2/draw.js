@@ -54,23 +54,32 @@ function drawGround(context) {
 		//calculate y coordinate of ground tile
 		if (i < 0) {
 			//the ground blocks are measured from the top of the block - lowest possible ground on screen is bottom of container minus tile size
-			var blockY =  (game.frameHeight-game.tileSize) - (game.ground[game.groundIndex-1][i+80]-player.y+game.height/2)*game.tileSize;
+			var blockY =  (game.frameHeight-game.tileSize) - (game.ground[game.groundIndex-1][i+game.width]-player.y+game.height/2)*game.tileSize;
 						
-		} else if (i < 80) {
+		} else if (i < game.width) {
 			var blockY =  (game.frameHeight-game.tileSize) - (game.ground[game.groundIndex][i]-player.y+game.height/2)*game.tileSize;
 			
 		} else {
-			var blockY =  (game.frameHeight-game.tileSize) - (game.ground[game.groundIndex+1][i-80]-player.y+game.height/2)*game.tileSize;
+			var blockY =  (game.frameHeight-game.tileSize) - (game.ground[game.groundIndex+1][i-game.width]-player.y+game.height/2)*game.tileSize;
 
 		}
 		
 		//first x coordinate of ground tiles always at 0 pixels
 		var blockX = n*game.tileSize;
 		
-		//sloped ground lines add terrain texture
-		context.lineTo(blockX + 0.3*game.tileSize, blockY)
-		context.lineTo(blockX + 0.7*game.tileSize, blockY)
+		ground_mode = 1;
+		switch(ground_mode) {
+			case 1:
+				//sloped ground lines add terrain texture
+				context.lineTo(blockX + 0.3*game.tileSize, blockY);
+				context.lineTo(blockX + 0.7*game.tileSize, blockY);
+				break;
+			
+			case 2:
+				//slopes connecting any terrain changes
+				
 		
+		}
 		n++;
 		
 	}
