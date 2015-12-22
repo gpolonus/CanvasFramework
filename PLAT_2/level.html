@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Test</title>
+</head>
+
+<script type="text/javascript">
+
+
+function init() {
+
+	//Initialize Canvas
+	c = document.getElementById("blah");
+	ctx = c.getContext("2d");
+
+	//Initialize Ground
+	ground = new Array();
+	
+	//Initialize Game vars
+	game = new Object();
+	game.tileSize = 10;
+	
+	toggleUpdate = 0;
+	
+}
+	
+function mousePos(e) {
+
+	var xOffset=Math.max(document.documentElement.scrollLeft,document.body.scrollLeft);
+	var yOffset=Math.max(document.documentElement.scrollTop,document.body.scrollTop);
+
+	mouseX = e.clientX + xOffset - c.offsetLeft;
+	mouseY = e.clientY + yOffset - c.offsetTop;
+	
+	if (toggleUpdate == 1) {
+		mainLoop();
+	}
+
+}
+	
+function keyDown(e) {
+
+			//var unicode=e.keyCode? e.keyCode : e.charCode
+			if (e.keyCode) {var unicode = e.keyCode}
+			//if (e.charCode) {var unicode = e.charCode}
+
+			if (unicode == 87) {keys.up = 1;}
+			if (unicode == 65) {keys.left = 1;}
+			if (unicode == 83) {keys.down = 1;}
+			if (unicode == 68) {keys.right = 1;}
+			if (unicode == 32) {keys.space = 1;}
+
+}
+
+function keyUp(e) {
+
+			//var unicode=e.keyCode? e.keyCode : e.charCode
+			if (e.keyCode) {var unicode = e.keyCode}
+			//if (e.charCode) {var unicode = e.charCode}
+
+			if (unicode == 87) {keys.up = 0;}
+			if (unicode == 65) {keys.left = 0;}
+			if (unicode == 83) {keys.down = 0;}
+			if (unicode == 68) {keys.right = 0;}
+			if (unicode == 32) {keys.space = 0;}
+}
+
+		//		    87 W
+		//	65 A	83 S	68 D
+
+
+
+function mainLoop() {
+
+	
+	ctx.clearRect(0,0,800,1200);
+	
+	tempBlockX = Math.floor(mouseX/10);
+	tempBlockY = 60-Math.ceil(mouseY/10);
+	
+	ground[tempBlockX] = tempBlockY;
+	
+	
+	ctx.beginPath();
+	for (i=0;i<ground.length;i++) {
+		if (ground[i]) {
+			ctx.rect(i*game.tileSize, 590-ground[i]*game.tileSize, game.tileSize, (ground[i]+1)*game.tileSize);
+		}
+	
+	}
+	ctx.fillStyle = 'yellow';
+    ctx.fill();
+}
+
+function addOffset(amount) {
+
+	for (i=0;i<ground.length;i++) {
+		ground[i] += amount;
+	}
+}
+
+//Start initialization when the page loads
+window.onload = init;
+</script>
+
+<style type="text/css">
+#controls {position: absolute;
+		   top: 0;
+		   right: 0;
+		   }
+
+</style>
+
+<body onkeydown="keyDown(event);" onkeyup="keyUp(event);" onmouseup="toggleUpdate = 0;">
+
+<canvas id="blah" width="800px" height="1200px" style="border:1px solid black;" onmousemove="mousePos(event);" onmousedown="toggleUpdate = 1;mousePos(event);">
+</canvas>
+
+<div id="controls">
+<input id="offset" type="text" value="offset" onclick="this.value='';" onblur="if(this.value=='') this.value='offset';" /><input type="button" value="add offset" onclick="addOffset(parseInt(document.getElementById('offset').value));" />
+<br />
+<input id="saveButton" type="button" value="save" />
+</div>
+
+
+
+
+</body>
+</html>
