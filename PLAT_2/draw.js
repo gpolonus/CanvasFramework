@@ -1,27 +1,26 @@
 function drawPlayer(context) {
 
-		context.beginPath();
+		// context.beginPath();
 		
 		//put the player at the center of the game container
-		context.rect(game.frameWidth/2, game.frameHeight-game.tileSize*player.height-game.frameHeight/2, player.width*game.tileSize, player.height*game.tileSize);
-		context.fillStyle = 'blue';
-		context.fill();
-
-		/*
-		if (player.direction) {
-			if (player.walkPattern > 2) {
-				context.drawImage(imageObj, 40*game.tileSize, 600-10*player.height-30*game.tileSize);
-			} else {
-				context.drawImage(imageObj3, 40*game.tileSize, 600-10*player.height-30*game.tileSize);
-			}
+		// context.rect(game.frameWidth/2, game.frameHeight-game.tileSize*player.height-game.frameHeight/2, player.width*game.tileSize, player.height*game.tileSize);
+		// context.fillStyle = 'blue';
+		// context.fill();
+		imageDrawn = undefined;
+		if (!player.direction) {
+			// if (player.walkPattern > 2) {
+				imageDrawn = jesusR;
+			// } else {
+			// 	imageDrawn = jesusRS;
+			// }
 		} else {
-			if (player.walkPattern > 2) {
-				context.drawImage(imageObj2, 40*game.tileSize, 600-10*player.height-30*game.tileSize);
-			} else {
-				context.drawImage(imageObj4, 40*game.tileSize, 600-10*player.height-30*game.tileSize);
-			}
+			// if (player.walkPattern > 2) {
+				imageDrawn = jesusL;
+			// } else {
+			// 	imageDrawn = jesusLS;
+			// }
 		}
-		*/
+		context.drawImage(imageDrawn, game.frameWidth/2, game.frameHeight-game.tileSize*player.height-game.frameHeight/2);
 }
 
 function drawBackground(context) {
@@ -42,52 +41,66 @@ function drawBackground(context) {
 
 function drawGround(context) {
 
-	
-	
-	context.beginPath();
-	
-	context.moveTo(0,game.frameHeight);
-	var n = 0;
-	for (i=(player.x%game.width)-game.width/2;i<(player.x%game.width)+game.width+1;i++) {
-	//negative indices provide points in previous ground arrays, indices above game.width provide points in the future ground array
-	
-		//calculate y coordinate of ground tile
-		if (i < 0) {
-			//the ground blocks are measured from the top of the block - lowest possible ground on screen is bottom of container minus tile size
-			var blockY =  (game.frameHeight-game.tileSize) - (game.ground[game.groundIndex-1][i+game.width]-player.y+game.height/2)*game.tileSize;
-						
-		} else if (i < game.width) {
-			var blockY =  (game.frameHeight-game.tileSize) - (game.ground[game.groundIndex][i]-player.y+game.height/2)*game.tileSize;
-			
-		} else {
-			var blockY =  (game.frameHeight-game.tileSize) - (game.ground[game.groundIndex+1][i-game.width]-player.y+game.height/2)*game.tileSize;
-
-		}
+	colors = ["brown","gray","blue","red"];
+	for(j=game.ground.length-1; j >= 0 ; j--)
+	{
+		context.beginPath();
+		context.moveTo(0,game.frameHeight);
+		var n = 0;
+		for (i=(player.x%game.width)-game.width/2;i<(player.x%game.width)+game.width+1;i++) {
+		//negative indices provide points in previous ground arrays, indices above game.width provide points in the future ground array
 		
-		//first x coordinate of ground tiles always at 0 pixels
-		var blockX = n*game.tileSize;
-		
-		ground_mode = 1;
-		switch(ground_mode) {
-			case 1:
-				//sloped ground lines add terrain texture
-				context.lineTo(blockX + 0.3*game.tileSize, blockY);
-				context.lineTo(blockX + 0.7*game.tileSize, blockY);
-				break;
-			
-			case 2:
-				//slopes connecting any terrain changes
+			//calculate y coordinate of ground tile
+			if (i < 0) {
+				//the ground blocks are measured from the top of the block - lowest possible ground on screen is bottom of container minus tile size
+				if(game.ground[j][game.groundIndex-1][i+game.width] != undefined)
+					var blockY =  (game.frameHeight-game.tileSize) - (game.ground[j][game.groundIndex-1][i+game.width]-player.y+game.height/2)*game.tileSize;
+				else
+					var blockY = game.frameHeight;
+							
+			} else if (i < game.width) {
 				
-		
+				if(game.ground[j][game.groundIndex][i] != undefined)
+					var blockY =  (game.frameHeight-game.tileSize) - (game.ground[j][game.groundIndex][i]-player.y+game.height/2)*game.tileSize;
+				else
+					var blockY = game.frameHeight;
+				
+			} else {
+				
+				if(game.ground[j][game.groundIndex+1][i-game.width] != undefined)
+					var blockY =  (game.frameHeight-game.tileSize) - (game.ground[j][game.groundIndex+1][i-game.width]-player.y+game.height/2)*game.tileSize;
+				else
+					var blockY = game.frameHeight;
+
+			}
+			
+			//first x coordinate of ground tiles always at 0 pixels
+			var blockX = n*game.tileSize;
+			
+			ground_mode = 1;
+			switch(ground_mode) {
+				case 1:
+					// if(blockY)
+					// {
+						//sloped ground lines add terrain texture
+						context.lineTo(blockX + 0.3*game.tileSize, blockY);
+						context.lineTo(blockX + 0.7*game.tileSize, blockY);
+						break;
+					// }
+				case 2:
+					//slopes connecting any terrain changes
+					
+			
+			}
+			n++;
+			
 		}
-		n++;
-		
+		context.lineTo(game.frameWidth,game.frameHeight);
+		context.closePath();
+		context.stroke();
+		context.fillStyle = colors[j];
+		context.fill();
 	}
-	context.lineTo(game.frameWidth,game.frameHeight);
-	context.closePath();
-	context.stroke();
-	context.fillStyle = 'brown';
-	context.fill();
 }
 
 function drawPlaced(context) {
