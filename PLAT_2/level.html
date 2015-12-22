@@ -4,6 +4,7 @@
 <title>Test</title>
 </head>
 
+<script src="../js/colorFuns.js"></script>
 <script type="text/javascript">
 
 
@@ -14,14 +15,14 @@ function init() {
 	ctx = c.getContext("2d");
 
 	//Initialize Ground
-	ground = new Array();
+	ground = [[]];
 	
 	//Initialize Game vars
 	game = new Object();
 	game.tileSize = 10;
 	
 	toggleUpdate = 0;
-	
+	game.groundIndex = 0;
 }
 	
 function mousePos(e) {
@@ -78,25 +79,56 @@ function mainLoop() {
 	tempBlockX = Math.floor(mouseX/10);
 	tempBlockY = 60-Math.ceil(mouseY/10);
 	
-	ground[tempBlockX] = tempBlockY;
-	
-	
-	ctx.beginPath();
-	for (i=0;i<ground.length;i++) {
-		if (ground[i]) {
-			ctx.rect(i*game.tileSize, 590-ground[i]*game.tileSize, game.tileSize, (ground[i]+1)*game.tileSize);
+	ground[get("platform").value][tempBlockX] = tempBlockY;
+
+	for(j=document.getElementsByTagName("option").length-1; j >= 0; j--)
+	{
+		ctx.beginPath();
+		for (i=0;i<ground[j].length;i++) {
+			if (ground[j][i]) {
+				ctx.rect(i*game.tileSize, 590-ground[j][i]*game.tileSize, game.tileSize, (ground[j][i]+1)*game.tileSize);
+			}
+
 		}
-	
+		ctx.fillStyle = randomColor();
+		ctx.fill();
 	}
-	ctx.fillStyle = 'yellow';
-    ctx.fill();
 }
 
 function addOffset(amount) {
 
-	for (i=0;i<ground.length;i++) {
-		ground[i] += amount;
+	for (i=0;i<ground[get("platform").value].length;i++) {
+		ground[get("platform").value][i] += amount;
 	}
+}
+
+function addPlatform()
+{
+	val = get("platform").value;
+	ground[document.getElementsByTagName("option").length] = [];
+	ground[document.getElementsByTagName("option").length] = [];
+	get("platform").innerHTML += "<option value='"+document.getElementsByTagName("option").length+"'>Level "+document.getElementsByTagName("option").length+"</option>";
+	get("platform").value = val;
+}
+
+function get(id)
+{
+	return document.getElementById(id);
+}
+
+function saveShit()
+{
+	p = "";
+	for(j = 0; j < ground.length; j++)
+	{
+		p += "game.ground["+j+"][game.groundIndex] = new Array("+ground[j][0];
+		for(i=1; i < ground[j].length; i++)
+		{
+			p += ","+ground[j][i];
+		}
+		p += ");\n";
+	}
+	get("p").innerHTML = p;
 }
 
 //Start initialization when the page loads
@@ -117,9 +149,16 @@ window.onload = init;
 </canvas>
 
 <div id="controls">
-<input id="offset" type="text" value="offset" onclick="this.value='';" onblur="if(this.value=='') this.value='offset';" /><input type="button" value="add offset" onclick="addOffset(parseInt(document.getElementById('offset').value));" />
+<input id="offset" type="text" value="offset" onclick="this.value='';" onblur="if(this.value=='') this.value='offset';" />
+<input type="button" value="add offset" onclick="addOffset(parseInt(document.getElementById('offset').value));" /><br><br>
+<select id="platform">
+	<option value="0">Bottom Ground</option>
+</select>
+<input type="button" id="addPlatform" value="Add Platform" onclick="addPlatform()" />
 <br />
-<input id="saveButton" type="button" value="save" />
+<input id="saveButton" type="button" value="save" onclick="saveShit()" />
+<textarea id="p">
+</textarea>
 </div>
 
 
