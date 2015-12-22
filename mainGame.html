@@ -13,7 +13,7 @@
 <body onkeydown="keyBooleans()" onkeyup="keyBooleans()">
 <div id="keyCodes"></div>
 <button onclick="oneRightStep=true">One Right Step</button><button onclick="oneLeftStep=true">One Left Step</button><br>
-<input type="number" id="initialVel" value="30">
+<input type="number" id="initialVel" value="80">
 <image src="Art/JesusL.png" style="display:none" id="JesusImgL">
 <image src="Art/JesusLS.png" style="display:none" id="JesusImgLS">
 <image src="Art/JesusR.png" style="display:none" id="JesusImgR">
@@ -52,9 +52,9 @@ var direction = false;
 // var dogHeight = 126;
 var state = "falling";
 var plats = [];
-var plat = new Platform();
+var plat = new Platform(undefined, undefined, "Ground");
 plats.push(plat);
-plats.push(new Platform(0,200));
+plats.push(new Platform(0,200,"Platform"));
 plats[1].pushFront(100,200);
 var jumpFrame = 0;
 var oneRightStep = false;
@@ -86,6 +86,19 @@ function render()
 	{
 		if(topPX  <  (plat.spot.next.y-plat.spot.y)/(plat.spot.next.x-plat.spot.x)*(leftPX - plat.spot.x)+plat.spot.y)
 		{
+			if(keys[65] || keys[68])
+			{
+				leftPX += keys[65] ? -1*speed : speed;
+			}
+			tallest = document.body.clientHeight*3;
+			for(jay in plats)
+			{
+				if(plats[jay].isOn(leftPX,topPX) && plats[jay].getY(leftPX) < tallest)
+				{
+					tallest = plats[jay].getY(leftPX);
+					plat = plats[jay];
+				}
+			}
 			topPX += (fallingFrame++);
 		}
 		else
@@ -93,64 +106,26 @@ function render()
 			fallingFrame = 0;
 			topPX = (plat.spot.next.y-plat.spot.y)/(plat.spot.next.x-plat.spot.x)*(leftPX - plat.spot.x)+plat.spot.y;
 			state = "walking";
-		}
-
-		if(keys[65] || keys[68])
-		{
-			leftPX += keys[65] ? -1*speed : speed;
-			for(jay in plats)
+			if(keys[65] || keys[68])
 			{
-				if(plats[jay].spot.next.x < leftPX)
-					if(plats[jay].spot.next.next == undefined)
-					{
-						plats[jay].spot = undefined;
-						state = "falling";
-						for(jee in plats)
-						{
-							if(plats[jee].getY() > topPX)
-								plat = plats[jee];
-						}
-					}
-					else
-					{
-						plats[jay].spot = plats[jay].spot.next;
-					}
-				else if(leftPX < plats[jay].spot.x)
+				if(leftPX > plat.spot.next.x)
 				{
-					if(plats[jay].spot.prev == undefined)
-					{
-						plats[jay].spot = undefined;
-						state = "falling";
-						for(jee in plats)
-						{
-							if(plats[jee].getY() > topPX)
-								plat = plats[jee];
-						}
-					}
-					else
-					{
-						plats[jay].spot = plats[jay].spot.prev;
-					}					
+					plat.spot = plat.spot.next;
+					position++;
+					if(position > plat.frontNum-2)
+						plat.pushFrontRand();
 				}
+				else if(leftPX < plat.spot.x)
+				{
+					plat.spot = plat.spot.prev;
+					position--;
+					if(position < plat.backNum+2)
+					{
+						plat.pushBackRand();
+					}
+				}
+				direction = keys[65];
 			}
-
-			// if(leftPX > plat.spot.next.x)
-			// {
-			// 	plat.spot = plat.spot.next;
-			// 	position++;
-			// 	if(position > plat.frontNum-2)
-			// 		plat.pushFrontRand();
-			// }
-			// else if(leftPX < plat.spot.x)
-			// {
-			// 	plat.spot = plat.spot.prev;
-			// 	position--;
-			// 	if(position < plat.backNum+2)
-			// 	{
-			// 		plat.pushBackRand();
-			// 	}
-			// }
-			// direction = keys[65];
 		}
 	}
 	else if (state == "walking")
@@ -159,40 +134,33 @@ function render()
 		{
 			dir = keys[65] || oneRightStep ? -1 : 1;
 			leftPX += keys[65] || oneRightStep ? -1*speed : speed;
-			
-			for(jay in plats)
+			if(leftPX > plat.spot.next.x)
 			{
-				if(plats[jay].spot.next.x < leftPX)
-					if(plats[jay].spot.next.next == undefined)
-					{
-						state = "falling";
-						for(jee in plats)
-						{
-							if(plats[jee].getY() > topPX)
-								plat = plats[jee];
-						}
-					}
-					else
-					{
-						plats[jay].spot = plats[jay].spot.next;
-					}
-				else if(leftPX < plats[jay].spot.x)
+				if(plat.spot.next.next == undefined)
+					state = "falling";
+				else
 				{
-					if(plats[jay].spot.prev == undefined)
-					{
-						state = "falling";
-						for(jee in plats)
-						{
-							if(plats[jee].getY() > topPX)
-								plat = plats[jee];
-						}
-					}
-					else
-					{
-						plats[jay].spot = plats[jay].spot.prev;
-					}					
+					plat.spot = plat.spot.next;
+					position++;
+					if(position > plat.frontNum-2)
+						plat.pushFrontRand();
 				}
 			}
+			else if(leftPX < plat.spot.x)
+			{
+				if(plat.spot.prev == undefined)
+					state = "falling";
+				else
+				{
+					plat.spot = plat.spot.prev;
+					position--;
+					if(position < plat.backNum+2)
+					{
+						plat.pushBackRand();
+					}
+				}
+			}
+			direction = keys[65];
 
 			if(leftPX == plat.spot.x)
 				topPX = plat.spot.y;
@@ -230,40 +198,33 @@ function render()
 		if(keys[65] || keys[68])
 		{
 			leftPX += keys[65] ? -1*speed : speed;
-			
-			for(jay in plats)
-			{
-				if(plats[jay].spot.next.x < leftPX)
-					if(plats[jay].spot.next.next == undefined)
-					{
-						state = "falling";
-						for(jee in plats)
-						{
-							if(plats[jee].getY() > topPX)
-								plat = plats[jee];
-						}
-					}
-					else
-					{
-						plats[jay].spot = plats[jay].spot.next;
-					}
-				else if(leftPX < plats[jay].spot.x)
-				{
-					if(plats[jay].spot.prev == undefined)
-					{
-						state = "falling";
-						for(jee in plats)
-						{
-							if(plats[jee].getY() > topPX)
-								plat = plats[jee];
-						}
-					}
-					else
-					{
-						plats[jay].spot = plats[jay].spot.prev;
-					}					
-				}
-			}
+			// if(leftPX > plat.spot.next.x)
+			// {
+			// 	if(plat.spot.next.next == undefined)
+			// 		state = "falling";
+			// 	else
+			// 	{
+			// 		plat.spot = plat.spot.next;
+			// 		position++;
+			// 		if(position > plat.frontNum-2)
+			// 			plat.pushFrontRand();
+			// 	}
+			// }
+			// else if(leftPX < plat.spot.x)
+			// {
+			// 	if(plat.spot.prev == undefined)
+			// 		state = "falling";
+			// 	else
+			// 	{
+			// 		plat.spot = plat.spot.prev;
+			// 		position--;
+			// 		if(position < plat.backNum+2)
+			// 		{
+			// 			plat.pushBackRand();
+			// 		}
+			// 	}
+			// }
+			direction = keys[65];
 		}
 	}
 
@@ -403,11 +364,12 @@ function SmokePuff(initialPosX, initialPosY)
 	}
 }
 
-function Platform(x,y)
+function Platform(x,y,name)
 {
 	x = x == undefined ? 0 : x;
 	y = y == undefined ? document.body.clientHeight - Math.round(Math.random()*300)-100 : y;
 	this.middle = new Node(x,y);
+	this.name = name;
 	this.front = this.middle;
 	this.back = this.middle;
 	this.frontNum = 0;
@@ -510,8 +472,31 @@ function Platform(x,y)
 		return (this.spot.next.y-this.spot.y)/(this.spot.next.x-this.spot.x)*(leftPX-this.spot.x) + this.spot.y;
 	}
 
+	this.isOn = function(x,y)
+	{		
+		temp = this.back;
+		if(x < temp.x)
+			return false;
+		if(this.front.x < x)
+			return false;
+		while(temp.next != undefined)
+		{
+			if(temp.x <= x && x <= temp.next.x)
+			{
+				this.spot = temp;
+				if(y <= this.getY(x))
+					return temp;
+				else
+					return false;
+			}
+			temp = temp.next;
+		}
+		return false;
+	}
+
 	function Node(x,y)
 	{
+		this.name = "Node";
 		this.next = null;
 		this.prev = null;
 		this.x = x;
