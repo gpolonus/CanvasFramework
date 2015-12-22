@@ -279,19 +279,19 @@ function collisionDetectRight() {
 	player.direction = true;
 
 	
-	for (i=(player.x%80); i < (player.x%80)+40; i++) {
+	for (i=(player.x%game.width); i < (player.x%game.width)+game.width/2; i++) { //do we really need to scan so far?
 		if (player.y < game.ground[game.levelIndex][game.groundIndex][i]) {
 			break;
 		}
 		
-		if (((player.x%80)) == 79 && player.y < game.ground[game.levelIndex][game.groundIndex+1][0]) {
+		if (((player.x%game.width)) == game.width-1 && player.y < game.ground[game.levelIndex][game.groundIndex+1][0]) {
 			break;
 		}
 	}
 	
-	if (i-(player.x%80) > 1) {
+	if (i-(player.x%game.width) > 1) {
 		player.x = player.x + 1;
-		if (((player.x%80)) == 0) {
+		if (((player.x%game.width)) == 0) {
 			//player.x = 0;
 			game.groundIndex++;
 		}
@@ -303,20 +303,20 @@ function collisionDetectLeft() {
 	player.direction = false;
 
 	
-	for (i=(player.x%80); i > (player.x%80)-40; i--) {
+	for (i=(player.x%game.width); i > (player.x%game.width)-game.width/2; i--) { //must we scan so far??
 		if (player.y < game.ground[game.levelIndex][game.groundIndex][i]) {
 			break;
 		}
 		
-		if (((player.x%80)) == 0 && player.y < game.ground[game.levelIndex][game.groundIndex-1][79]) {
+		if (((player.x%game.width)) == 0 && player.y < game.ground[game.levelIndex][game.groundIndex-1][game.width-1]) {
 			break;
 		}
 	}
 	
 	//This part is weird since after player.x -= 1, player.x%80 can be -1 or 79 I think
-	if ((player.x%80)-i > 1) {
+	if ((player.x%game.width)-i > 1) {
 		player.x = player.x - 1;
-		if (((player.x%80)) == 79 || ((player.x%80)) == -1) {
+		if (((player.x%game.width)) == game.width-1 || ((player.x%game.width)) == -1) {
 			
 			//In case player goes backward from 1st frame
 			//if(((player.x%80)) == -1) {
@@ -330,11 +330,8 @@ function collisionDetectLeft() {
 		
 function playerGravity() {
 	
-	// check to change levelIndex
-	for(j = 0; j < game.ground.length; j++)
-		if(player.y > game.ground[j][game.groundIndex][player.x])
-			game.levelIndex = j;
-
+	
+	
 	//first check for boxes under player
 	if (placed.array[player.x]) {
 	
@@ -374,7 +371,7 @@ function playerGravity() {
 				
 			}
 			else {
-				player.y = game.ground[game.levelIndex][game.groundIndex][(player.x%80)] + 1;
+				player.y = game.ground[game.levelIndex][game.groundIndex][(player.x%game.width)] + 1;
 			}
 			
 		}
@@ -383,9 +380,9 @@ function playerGravity() {
 	
 
 
-	else if (player.vVel != 0 || ( (player.y - game.ground[game.levelIndex][game.groundIndex][(player.x%80)]) > 1) ) {
+	else if (player.vVel != 0 || ( (player.y - game.ground[game.levelIndex][game.groundIndex][(player.x%game.width)]) > 1) ) {
 	
-		if (player.vVel == 0 && (player.y <= game.ground[game.levelIndex][game.groundIndex][(player.x%80)-1]+1) ) {
+		if (player.vVel == 0 && (player.y <= game.ground[game.levelIndex][game.groundIndex][(player.x%game.width)-1]+1) ) {
 			player.y = player.y - 1.1;
 			
 		} else {
@@ -396,17 +393,39 @@ function playerGravity() {
 		
 		
 		
-		if ((player.y - game.ground[game.levelIndex][game.groundIndex][(player.x%80)]) <= 1) {
+		if ((player.y - game.ground[game.levelIndex][game.groundIndex][(player.x%game.width)]) <= 1) {
 			player.vVel = 0;
-			player.y = game.ground[game.levelIndex][game.groundIndex][(player.x%80)] + 1;
+			player.y = game.ground[game.levelIndex][game.groundIndex][(player.x%game.width)] + 1;
 		}
 	
 
 	}
-	else if (Math.floor(player.y) <= game.ground[game.levelIndex][game.groundIndex][(player.x%80)]) {
-			player.y = game.ground[game.levelIndex][game.groundIndex][(player.x%80)] + 1;
+	else if (Math.floor(player.y) <= game.ground[game.levelIndex][game.groundIndex][(player.x%game.width)]) {
+			player.y = game.ground[game.levelIndex][game.groundIndex][(player.x%game.width)] + 1;
 		
 	}
+	
+	
+	// check to change levelIndex
+	var maxHeightJ = 0;
+	for(var j = 0; j < game.ground.length; j++) {
+		// check for upper platforms that are actually lower than underneath platforms
+		if (j > 0) {
+			if (game.ground[j][game.groundIndex][player.x] > game.ground[maxHeightJ][game.groundIndex][player.x]) {
+				maxHeightJ = j;
+			}
+		}
+		
+		// set levelIndex to platform the player is above
+		if (player.y > game.ground[j][game.groundIndex][player.x] && j == maxHeightJ) {
+			game.levelIndex = j;
+			
+			
+		}
+	}
+	
+	
+	
 }
 
 
@@ -414,8 +433,8 @@ function playerShoot() {
 	
 	if (player.fireX != 0) {
 		
-		var dirX = player.fireX - 40;
-		var dirY = player.fireY - 30 - player.height;
+		var dirX = player.fireX - game.width/2;
+		var dirY = player.fireY - game.height/2 - player.height;
 		var dirT = Math.sqrt(dirX*dirX + dirY*dirY);
 		
 		switch(player.weapon) {
@@ -437,7 +456,7 @@ function playerShoot() {
 					placed.array[player.x] = new Array();
 					placed.array[player.x][0] = new Object();
 					placed.array[player.x][0].x = player.x;
-					placed.array[player.x][0].y = game.ground[game.levelIndex][game.groundIndex][player.x%80]+1;
+					placed.array[player.x][0].y = game.ground[game.levelIndex][game.groundIndex][player.x%game.width]+1;
 					placed.array[player.x][0].boxType = 1;
 				}
 				else if (placed.array[player.x][placed.array[player.x].length - 1].y < player.y) {//put another on top if top is lower than player
@@ -511,7 +530,7 @@ function mainLoop() {
 	
 	
 	//Debug output 
-	document.getElementById('status').innerHTML = player.fuel;
+	document.getElementById('status').innerHTML = game.ground[0][game.groundIndex][player.x] + " " + game.ground[1][game.groundIndex][player.x] + " " + game.ground[2][game.groundIndex][player.x] + " " + game.ground[3][game.groundIndex][player.x] + "<br />" + game.levelIndex + " " + player.y;
 
 	if (player.x == 10) {
 		trigger.response = true;
