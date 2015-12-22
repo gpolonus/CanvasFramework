@@ -33,17 +33,17 @@ function init() {
 	imageObj7.src = 'box.png';
 	
 	
-	//Initialize Canvas
-	c = document.getElementById("blah");
-	ctx = c.getContext("2d");
-	
 	
 	
 	unicode = 0;
 	
 	//Initialize Game vars
 	game = new Object();
-	game.tileSize = 10;
+	game.tileSize = 10; //tile width and height in pixels; MAKE IT 100!
+	game.height = 60; //game height in tiles
+	game.width = 80; // game width in tiles
+	game.frameHeight = game.tileSize*game.height; //game container height in pixels
+	game.frameWidth = game.tileSize*game.width; //game container width in pixels
 	
 		//Initialize ground
 		game.ground = new Array();
@@ -58,7 +58,8 @@ function init() {
 		game.ground[5] = new Array(167, 167, 167, 167, 167, 167, 166, 163, 159, 158, 157, 156, 154, 120, 119, 122, 120, 119, 118, 117, 116, 114, 113, 112, 110, 109, 109, 108, 108, 108, 108, 108, 107, 107, 107, 107, 107, 108, 107, 107, 107, 106, 107, 107, 107, 107, 107, 107, 107, 106, 106, 106, 106, 106, 113, 113, 113, 112, 110, 109, 109, 108, 108, 108, 108, 108, 108, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 107, 106);
 		game.ground[6] = new Array(106, 105, 101, 100, 98, 96, 94, 92, 66, 62, 49, 44, 31, 29, 13, 11, 5, 2, -2, -4, -7, -8, -9, -10, -10, -10, -11, -11, -11, -11, -11, -11, -11, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -11, -11, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -11, -12, -12, -12, -12, -13, -13, -12, -12, -12, -12, -13);
 		game.ground[7] = new Array(-9, -9, -9, -8, -7, -6, -6, -5, -5, -4, -4, -4, -4, -4, -4, -4, -4, -3, -3, -3, -2, -2, -2, -1, -1, -1, -1, 1, 2, 2, 0, -2, -1, 1, 2, 2, 3, 4, 4, 4, 5, 6, 6, 6, 7, 7, 8, 8, 8, 9, 9, 9, 10, 9, 10, 10, 10, 10, 10, 11, 11, 12, 13, 13, 14, 14, 15, 15, 16, 17, 17, 18, 18, 18, 18, 19, 19, 19, 19, 19);
-		
+	
+	
 	//Initialize Player
 	player = new Object();
 	player.speed = 1;
@@ -101,6 +102,16 @@ function init() {
 	
 	//initialize mouse
 	mouse = new Object();
+	
+	
+	//Initialize Canvas
+	c = document.getElementById("blah");
+	c.width = game.frameWidth;
+	c.height = game.frameHeight;
+	ctx = c.getContext("2d");
+	
+	
+	
 	
 	//Start main loop
 	mainLoop();
@@ -151,7 +162,7 @@ function mouseDown(e) {
 			mouse.y = e.clientY + yOffset - c.offsetTop;
 			
 			player.fireX = Math.floor(mouse.x/game.tileSize);
-			player.fireY = 600/game.tileSize - Math.floor(mouse.y/game.tileSize);
+			player.fireY = game.frameHeight/game.tileSize - Math.floor(mouse.y/game.tileSize);
 
 }
 
@@ -424,7 +435,7 @@ function updateBullets() {
 
 	for(i=0; i<bullets.index; i++) {
 		bullets.array[i].x += bullets.array[i].dirX*4 + Math.random()/5;
-		bullets.array[i].y += bullets.array[i].dirY*4 //+ Math.random()/10;
+		bullets.array[i].y += bullets.array[i].dirY*4 + Math.random()/10;
 		
 	}
 }
@@ -455,7 +466,7 @@ function mainLoop() {
 	playerShoot();
 	
 
-	ctx.clearRect(0,0,800,600);
+	ctx.clearRect(0,0,game.frameWidth,game.frameHeight);
 	drawBackground(ctx);
 	drawGround(ctx);
 	drawPlaced(ctx);

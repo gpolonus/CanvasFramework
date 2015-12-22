@@ -1,8 +1,9 @@
 function drawPlayer(context) {
 
 		context.beginPath();
-		//context.rect(player.x*game.tileSize, 600-10*player.height-player.y*game.tileSize, player.width*game.tileSize, player.height*game.tileSize);
-		context.rect(40*game.tileSize, 600-game.tileSize*player.height-30*game.tileSize, player.width*game.tileSize, player.height*game.tileSize);
+		
+		//put the player at the center of the game container
+		context.rect(game.frameWidth/2, game.frameHeight-game.tileSize*player.height-game.frameHeight/2, player.width*game.tileSize, player.height*game.tileSize);
 		context.fillStyle = 'blue';
 		context.fill();
 
@@ -45,38 +46,35 @@ function drawGround(context) {
 	
 	context.beginPath();
 	
-	context.moveTo(0,600);
+	context.moveTo(0,game.frameHeight);
 	var n = 0;
-	for (i=(player.x%80)-40;i<(player.x%80)+41;i++) {
-		
+	for (i=(player.x%game.width)-game.width/2;i<(player.x%game.width)+game.width+1;i++) {
+	//negative indices provide points in previous ground arrays, indices above game.width provide points in the future ground array
+	
+		//calculate y coordinate of ground tile
 		if (i < 0) {
-		
-			var blockY =  590 - (game.ground[game.groundIndex-1][i+80]-player.y+30)*game.tileSize; //590-game.ground[0][i]*game.tileSize;
-			var blockX = n*game.tileSize; //i*game.tileSize;
-			
-			context.lineTo(blockX + 0.3*game.tileSize, blockY)//, game.tileSize, (game.ground[game.groundIndex-1][i+80]+1)*game.tileSize);
-			context.lineTo(blockX + 0.7*game.tileSize, blockY)
-			
+			//the ground blocks are measured from the top of the block - lowest possible ground on screen is bottom of container minus tile size
+			var blockY =  (game.frameHeight-game.tileSize) - (game.ground[game.groundIndex-1][i+80]-player.y+game.height/2)*game.tileSize;
+						
 		} else if (i < 80) {
-		
-			var blockY =  590 - (game.ground[game.groundIndex][i]-player.y+30)*game.tileSize; //590-game.ground[0][i]*game.tileSize;
-			var blockX = n*game.tileSize; //i*game.tileSize;
-			context.lineTo(blockX + 0.3*game.tileSize, blockY)//, game.tileSize, (game.ground[game.groundIndex][i]+1)*game.tileSize);
-			context.lineTo(blockX + 0.7*game.tileSize, blockY)
+			var blockY =  (game.frameHeight-game.tileSize) - (game.ground[game.groundIndex][i]-player.y+game.height/2)*game.tileSize;
 			
 		} else {
-		
-			var blockY =  590 - (game.ground[game.groundIndex+1][i-80]-player.y+30)*game.tileSize; //590-game.ground[0][i]*game.tileSize;
-			var blockX = n*game.tileSize; //i*game.tileSize;
-			context.lineTo(blockX + 0.3*game.tileSize, blockY)//, game.tileSize, (game.ground[game.groundIndex+1][i-80]+1)*game.tileSize);
-			context.lineTo(blockX + 0.7*game.tileSize, blockY)
-		}
+			var blockY =  (game.frameHeight-game.tileSize) - (game.ground[game.groundIndex+1][i-80]-player.y+game.height/2)*game.tileSize;
 
+		}
+		
+		//first x coordinate of ground tiles always at 0 pixels
+		var blockX = n*game.tileSize;
+		
+		//sloped ground lines add terrain texture
+		context.lineTo(blockX + 0.3*game.tileSize, blockY)
+		context.lineTo(blockX + 0.7*game.tileSize, blockY)
 		
 		n++;
 		
 	}
-	context.lineTo(800,600);
+	context.lineTo(game.frameWidth,game.frameHeight);
 	context.closePath();
 	context.stroke();
 	context.fillStyle = 'brown';
@@ -84,13 +82,14 @@ function drawGround(context) {
 }
 
 function drawPlaced(context) {
-	for(i=player.x-40; i<player.x+40; i++) {
+	for(i=player.x-game.width/2; i<player.x+game.width/2; i++) {
 		if (placed.array[i]) { //Temp fix
 			
 			for (j=0; j<placed.array[i].length; j++) {
 			
-				var coordX = (placed.array[i][j].x-player.x+40)*game.tileSize;
-				var coordY =  590 - (placed.array[i][j].y-player.y+30)*game.tileSize;
+				var coordX = (placed.array[i][j].x-player.x+game.width/2)*game.tileSize;
+				//the ground blocks are measured from the top of the block - lowest possible ground on screen is bottom of container minus tile size
+				var coordY =  (game.frameHeight-game.tileSize) - (placed.array[i][j].y-player.y+game.height/2)*game.tileSize;
 			
 				switch (placed.array[i][j].boxType) {
 					case 1:
@@ -108,9 +107,9 @@ function drawPlaced(context) {
 function drawBullets(context) {
 
 		for(i=0; i<bullets.index; i++) {
-		
-		var coordY =  590 - (bullets.array[i].y-player.y+30)*game.tileSize;
-		var coordX = (bullets.array[i].x-player.x+40)*game.tileSize;
+		//the ground blocks are measured from the top of the block - lowest possible ground on screen is bottom of container plus tile size
+		var coordY =  (game.frameHeight-game.tileSize) - (bullets.array[i].y-player.y+game.height/2)*game.tileSize;
+		var coordX = (bullets.array[i].x-player.x+game.width/2)*game.tileSize;
 		
 		context.beginPath();
 		context.rect(coordX, coordY, game.tileSize/5, game.tileSize/5);
@@ -124,7 +123,7 @@ function drawBullets(context) {
 
 function drawAlertMessage(context) {
 	context.beginPath();
-	context.rect(0, 0, 800, 100);
+	context.rect(0, 0, game.frameWidth, game.frameHeight/6);
 	context.fillStyle = 'black';
 	context.fill();
 }
