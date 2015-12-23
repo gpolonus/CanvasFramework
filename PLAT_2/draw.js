@@ -42,7 +42,7 @@ function drawBackground(context) {
 function drawGround(context) {
 
 	colors = ["brown","gray","blue","red"];
-	for(j=game.ground.length-1; j >= 0 ; j--)
+	for(var j = game.ground.length-1; j >= 0 ; j--)
 	{
 		context.beginPath();
 		context.moveTo(0,game.frameHeight);
@@ -89,7 +89,10 @@ function drawGround(context) {
 					// }
 				case 2:
 					//slopes connecting any terrain changes
-					
+					break;
+
+				default:
+					break;
 			
 			}
 			n++;
