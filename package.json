@@ -1,0 +1,24 @@
+{
+  "name": "foosball-client",
+  "version": "1.0.0",
+  "description": "front end for the foosball app",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack",
+    "test": "test",
+    "start": "webpack-dev-server --open --port 4200"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "css-loader": "^0.28.7",
+    "node-sass": "^4.7.2",
+    "sass-loader": "^6.0.6",
+    "style-loader": "^0.19.1",
+    "vue": "^2.5.10",
+    "vue-loader": "^13.5.0",
+    "vue-template-compiler": "^2.5.10",
+    "webpack": "^3.10.0",
+    "webpack-dev-server": "^2.9.7"
+  }
+}
