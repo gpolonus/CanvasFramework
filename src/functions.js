@@ -12,4 +12,11 @@ function random(num) {
   return Math.round(Math.random() * num);
 }
 
-export {render, random};
+function log(text, repeat) {
+  if(repeat)
+    document.getElementById('log').innerHTML += '<br><pre>' + text + '</pre>';
+  else
+    document.getElementById('log').innerHTML = '<pre>' + text + '</pre>';
+}
+
+export {render, random, log};

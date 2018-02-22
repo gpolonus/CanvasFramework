@@ -37,10 +37,10 @@ export default class EventRegistry {
 
   triggerEvent(ge, index, active) {
     if (ge.run) {
-      triggers.push(ge);
       if (ge.run !== true) {
         ge.run = ge.run - 1;
       }
+      return ge;
     } else {
       active.splice(index, 1);
     }
@@ -49,8 +49,10 @@ export default class EventRegistry {
   triggerEvents() {
     const triggers = [];
     Object.keys(this.eventMap).map(eventType =>
-      this.eventMap[eventType].map(event =>
-        event.active.map(this.triggerEvent)
+      this.eventMap[eventType].map(({event: event}) =>
+        event.active.map((ge, index, active) => 
+          triggers.push(this.triggerEvent(ge, index, active, triggers))
+        )
       )
     );
     triggers.map(({trigger: trigger}) => this.triggerMap[trigger]());
