@@ -1,5 +1,5 @@
 
-export default class Camera {
+export default class Viewport {
   constructor(dims) {
     dims = dims || {
       x: 0,
@@ -12,5 +12,12 @@ export default class Camera {
     this.y = dims.y;
     this.w = dims.w;
     this.h = dims.h;
+  }
+
+  set(dims) {
+    this.x = dims.x || this.x;
+    this.y = dims.y || this.y;
+    this.w = dims.w || this.w;
+    this.h = dims.h || this.h;
   }
 }

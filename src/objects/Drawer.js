@@ -1,14 +1,14 @@
-import RandomUtil from '../utils/RandomUtil';
+import random from '../functions/random';
 
 export default class Drawer {
   constructor(drawingUtil) {
     this.du = drawingUtil;
     const funcs = new Array(Math.round(Math.random() * 100)).fill(0).map(() => {
-      const x = RandomUtil.random(1000);
-      const y = RandomUtil.random(1000);
-      const w = x + RandomUtil.random(500);
-      const h = y + RandomUtil.random(500);
-      const color = ['red', 'green', 'blue', 'yellow', 'grey'][RandomUtil.random(5)];
+      const x = random(1000);
+      const y = random(1000);
+      const w = x + random(500);
+      const h = y + random(500);
+      const color = ['white', 'grey'][random(2)];
       return {
         x: x,
         y: y,

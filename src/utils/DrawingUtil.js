@@ -1,37 +1,54 @@
 
 export default class DrawingUtil {
-  constructor(canvasUtil, camera) {
+  constructor(canvasUtil, vp) {
     this.cu = canvasUtil;
-    this.c = camera;
+    this.vp = vp;
   }
 
   rectangle(x, y, w, h, color) {
-    const newPoint = this.fixPoint(x, y);
+    color = color || 'black';
+    const newBox = this.fixBox(x, y, w, h);
     this.cu.rectangle(
-      newPoint.x,
-      newPoint.y,
-      w / this.c.w * this.cu.dims.width,
-      h / this.c.h * this.cu.dims.height,
+      newBox.x,
+      newBox.y,
+      newBox.w,
+      newBox.h,
       color
     );
   }
 
   box(x, y, w, h, color, lineWidth) {
-    const newPoint = this.fixPoint(x, y);
+    const newBox = this.fixBox(x, y, w, h);
     this.cu.box(
-      newPoint.x,
-      newPoint.y,
-      w / this.c.w * this.cu.dims.width,
-      h / this.c.h * this.cu.dims.height,
+      newBox.x,
+      newBox.y,
+      newBox.w,
+      newBox.h,
       color,
       lineWidth
     );
   }
 
+  points(points, color, lineWidth) {
+    color = color || 'black';
+    lineWidth = lineWidth || 2;
+    this.cu.points(points.map(p => this.fixPoint(p.x, p.y)), color, lineWidth);
+  }
+
   fixPoint(x, y) {
     return {
-      x: (x - this.c.x) / this.c.w * this.cu.dims.width,
-      y: (y - this.c.y) / this.c.h * this.cu.dims.height
+      x: (x - this.vp.x) / this.vp.w * this.cu.dims.width,
+      y: (y - this.vp.y) / this.vp.h * this.cu.dims.height
+    };
+  }
+
+  fixBox(x, y, w, h) {
+    const newPoint = this.fixPoint(x, y);
+    return {
+      x: newPoint.x,
+      y: newPoint.y,
+      w: w / this.vp.w * this.cu.dims.width,
+      h: h / this.vp.h * this.cu.dims.height,
     };
   }
 }

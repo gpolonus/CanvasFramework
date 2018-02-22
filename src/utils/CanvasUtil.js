@@ -10,7 +10,7 @@ export default class CanvasUtil {
 
   setViewOptions(options) {
     const paneView = options ? options.paneView : options;
-    const responsive = options.responsive;
+    const responsive = options ? options.responsive : false;
 
     if (responsive) {
       window.addEventListener('resize', () => {
@@ -97,6 +97,20 @@ export default class CanvasUtil {
     this.context.strokeStyle = color;
     this.context.lineWidth = lineWidth;
     this.context.strokeRect(x, y, w, h);
+  }
+
+  points(points, color, lineWidth) {
+    const ctx = this.context;
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    let i = 1;
+    Array(points.length - 1).fill(1).map(() => {
+      ctx.lineTo(points[i].x, points[i++].y);
+    });
+    ctx.lineTo(points[0].x, points[0].y);
+    ctx.stroke();
   }
 
   static getViewSquare() {

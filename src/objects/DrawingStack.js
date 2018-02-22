@@ -5,7 +5,7 @@ export default class DrawingStack {
 
   push(funcs) {
     if (funcs.length) {
-      funcs.map(func => this.stack.push(func));
+      this.stack = this.stack.concat(funcs);
     } else {
       this.stack.push(funcs);
     }
