@@ -19,4 +19,14 @@ function log(text, repeat) {
     document.getElementById('log').innerHTML = '<pre>' + text + '</pre>';
 }
 
-export {render, random, log};
+function once(func) {
+  let i = true;
+  return () => {
+    if(i) {
+      func();
+      i = false;
+    }
+  }
+}
+
+export {render, random, log, once};

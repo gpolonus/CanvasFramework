@@ -14,10 +14,10 @@ export default class Viewport {
     this.h = dims.h;
   }
 
-  set(dims) {
-    this.x = dims.x || this.x;
-    this.y = dims.y || this.y;
-    this.w = dims.w || this.w;
-    this.h = dims.h || this.h;
+  set({x: x, y: y, w: w, h: h}) {
+    this.x = x || this.x;
+    this.y = y || this.y;
+    this.w = w || this.w;
+    this.h = h || this.h;
   }
 }

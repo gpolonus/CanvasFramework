@@ -1,5 +1,5 @@
 
-import {render, random} from './functions';
+import {render, random, log, once} from './functions';
 import CanvasUtil from './utils/CanvasUtil';
 import Viewport from './objects/Viewport';
 import DrawingUtil from './utils/DrawingUtil';
@@ -29,20 +29,38 @@ const getStep = (canvas) => {
     x: 500,
     y: 500
   };
-  // const g = new Game(du);
+  let pickedUp = -1;
+  const pickUp = () => {
+    pickedUp = dots.findIndex(dot => {
+      return dot.x < center.x + 15 &&
+        dot.y < center.y + 15 &&
+        center.x - 15 < dot.x &&
+        center.y - 15 < dot.y;
+    });
+  }
   const er = new EventRegistry(canvas, {
-    'left': () => center.x--,
-    'up': () => center.y--,
-    'right': () => center.x++,
-    'down': () => center.y++
+    'left': () => center.x -= 2,
+    'up': () => center.y -= 2,
+    'right': () => center.x += 2,
+    'down': () => center.y += 2,
+    'pickUp': once(pickUp),
+    'reset-pickUp': () => {
+      pickedUp = -1;
+      er.addTrigger('pickUp', once(pickUp));
+    }
   });
   er.key(37, {'down': 'left'});
   er.key(38, {'down': 'up'});
   er.key(39, {'down': 'right'});
   er.key(40, {'down': 'down'});
+  er.key(32, {'down': 'pickUp'});
+  er.key(32, {'up': 'reset-pickUp'});
   return () => {
     // always trigger events first
     er.triggerEvents();
+    if(pickedUp !== -1) {
+      Object.assign(dots[pickedUp], center);
+    }
     // draw background before drawing other things
     cu.background('grey');
     // always set the viewport before drawing other things
@@ -52,7 +70,7 @@ const getStep = (canvas) => {
       y: center.y - 500,
     });
     // draw things
-    du.rectangle(center.x - 5, center.y - 5, 30, 30);
+    du.rectangle(center.x - 15, center.y - 15, 30, 30);
     drawDots(dots);
   };
 };

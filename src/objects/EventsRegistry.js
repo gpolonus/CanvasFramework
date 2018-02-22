@@ -4,6 +4,7 @@ import * as $ from 'jquery';
 export default class EventRegistry {
   constructor(canvas, triggerMap) {
     this.canvas = canvas;
+    // TODO: Refactor eventtMap types to be objects with keys at indicies instead of arrays
     $(this.canvas).on('mousedown mouseup mousemove', event => {
       this.eventMap.mouse.map(({event: me, st: st}) => {
         me.activate(event);
@@ -24,10 +25,10 @@ export default class EventRegistry {
     };
 
     // from trigger to function
-    this.triggerMap = this.setTrigger(triggerMap);
+    this.triggerMap = this.setTriggers(triggerMap);
   }
 
-  setTrigger(triggerMap) {
+  setTriggers(triggerMap) {
     return Object.assign(this.triggerMap || {}, triggerMap);
   }
 
@@ -50,9 +51,10 @@ export default class EventRegistry {
     const triggers = [];
     Object.keys(this.eventMap).map(eventType =>
       this.eventMap[eventType].map(({event: event}) =>
-        event.active.map((ge, index, active) => 
-          triggers.push(this.triggerEvent(ge, index, active, triggers))
-        )
+        event.active.map((ge, index, active) => {
+        const trigger = this.triggerEvent(ge, index, active, triggers);
+          trigger && triggers.push(trigger);
+        })
       )
     );
     triggers.map(({trigger: trigger}) => this.triggerMap[trigger]());
