@@ -29,4 +29,8 @@ function once(func) {
   }
 }
 
-export {render, random, log, once};
+function mod(n, p) {
+  return ((n % p) + p) % p;
+}
+
+export {render, random, log, once, mod};

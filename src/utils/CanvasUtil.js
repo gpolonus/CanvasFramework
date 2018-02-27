@@ -35,25 +35,40 @@ export default class CanvasUtil {
   }
 
   getPaneView(px) {
-    let suffix = '';
     if (px) {
-      suffix = 'px'
-    }
-    if (this._paneView === 'full') {
-      return {
-        height: window.innerHeight + suffix,
-        width: window.innerWidth + suffix,
-        top: 0,
-        left: 0,
-      };
-    } else if (this._paneView === 'square') {
-      const dims = CanvasUtil.getViewSquare();
-      return {
-        height: dims.l + suffix,
-        width: dims.l + suffix,
-        top: dims.y + suffix,
-        left: dims.x + suffix,
-      };
+      if (this._paneView === 'full') {
+        return {
+          height: window.innerHeight + 'px',
+          width: window.innerWidth + 'px',
+          top: 0 + 'px',
+          left: 0 + 'px',
+        };
+      } else if (this._paneView === 'square') {
+        const dims = CanvasUtil.getViewSquare();
+        return {
+          height: dims.l + 'px',
+          width: dims.l + 'px',
+          top: dims.y + 'px',
+          left: dims.x + 'px',
+        };
+      }
+    } else {
+      if (this._paneView === 'full') {
+        return {
+          height: window.innerHeight,
+          width: window.innerWidth,
+          top: 0,
+          left: 0,
+        };
+      } else if (this._paneView === 'square') {
+        const dims = CanvasUtil.getViewSquare();
+        return {
+          height: dims.l,
+          width: dims.l,
+          top: dims.y,
+          left: dims.x,
+        };
+      }
     }
   }
 
@@ -99,7 +114,7 @@ export default class CanvasUtil {
     this.context.strokeRect(x, y, w, h);
   }
 
-  points(points, color, lineWidth) {
+  points(points, color, lineWidth, connect) {
     const ctx = this.context;
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = color;
@@ -109,7 +124,8 @@ export default class CanvasUtil {
     Array(points.length - 1).fill(1).map(() => {
       ctx.lineTo(points[i].x, points[i++].y);
     });
-    ctx.lineTo(points[0].x, points[0].y);
+    if(connect)
+      ctx.lineTo(points[0].x, points[0].y);
     ctx.stroke();
   }
 

@@ -7,7 +7,7 @@ export default class DrawingUtil {
 
   rectangle(x, y, w, h, color) {
     color = color || 'black';
-    const newBox = this.fixBox(x, y, w, h);
+    const newBox = this.scaleBox(x, y, w, h);
     this.cu.rectangle(
       newBox.x,
       newBox.y,
@@ -18,7 +18,7 @@ export default class DrawingUtil {
   }
 
   box(x, y, w, h, color, lineWidth) {
-    const newBox = this.fixBox(x, y, w, h);
+    const newBox = this.scaleBox(x, y, w, h);
     this.cu.box(
       newBox.x,
       newBox.y,
@@ -32,18 +32,23 @@ export default class DrawingUtil {
   points(points, color, lineWidth) {
     color = color || 'black';
     lineWidth = lineWidth || 2;
-    this.cu.points(points.map(p => this.fixPoint(p.x, p.y)), color, lineWidth);
+    const scaledPoints = points.map(p => this.scalePoint(p.x, p.y));
+    this.cu.points(scaledPoints, color, lineWidth);
   }
 
-  fixPoint(x, y) {
+  background(color) {
+    this.cu.background(color);
+  }
+
+  scalePoint(x, y) {
     return {
       x: (x - this.vp.x) / this.vp.w * this.cu.dims.width,
       y: (y - this.vp.y) / this.vp.h * this.cu.dims.height
     };
   }
 
-  fixBox(x, y, w, h) {
-    const newPoint = this.fixPoint(x, y);
+  scaleBox(x, y, w, h) {
+    const newPoint = this.scalePoint(x, y);
     return {
       x: newPoint.x,
       y: newPoint.y,
