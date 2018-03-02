@@ -12,6 +12,6 @@ export default class DrawingStack {
   }
 
   draw(du) {
-    Object.keys(this.stack).map(key => this.stack[key](du));
+    Object.values(this.stack).map(value => value(du));
   }
 }
