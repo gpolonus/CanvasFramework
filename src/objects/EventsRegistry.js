@@ -1,22 +1,44 @@
 
-import * as $ from 'jquery';
-
 export default class EventRegistry {
-  constructor(canvas, actionMap) {
-    this.canvas = canvas;
+  constructor(el, actionMap) {
+    /*********
+     *
+     * EVENTS TRIGGER ACTIONS
+     *
+    **********/
     // TODO: Refactor eventtMap types to be objects with keys at indicies instead of arrays
-    $(this.canvas).on('mousedown mouseup mousemove', event => {
-      this.eventMap.mouse.map(({event: me, st: st}) => {
+    const mouseEvetHandler = event => {
+      this.eventMap.mouse.map(({ event: me, st }) => {
         me.activate(event);
-        if(st) me.active.map(({action: a}) => this.actionMap[a]());
+        if (st) me.active.map(({ action: a }) => this.actionMap[a](event));
       });
+    };
+    el && 'mousedown mouseup mousemove'.split(' ').map(eventType => {
+      el.addEventListener(eventType, mouseEvetHandler);
     });
-    $(document.body).on('keydown keyup', event => {
-      this.eventMap.key.map(({event: ke, st: st}) => {
+
+    const keyEventHandler = event => {
+      this.eventMap.key.map(({ event: ke, st }) => {
         ke.activate(event);
-        if(st) ke.active.map(({action: a}) => this.actionMap[a]());
+        if (st) ke.active.map(({ action: a }) => this.actionMap[a](event));
       });
+    };
+    'keydown keyup'.split(' ').map(eventType => {
+      document.body.addEventListener(eventType, keyEventHandler);
     });
+
+    this.stopListening = () => {
+      'keydown keyup'.split(' ').map(eventType => {
+        document.body.removeEventListener(eventType, keyEventHandler);
+      });
+
+      el && 'mousedown mouseup mousemove'.split(' ').map(eventType => {
+        el.removeEventListener(eventType, mouseEvetHandler);
+      });
+
+      this.removeEvents();
+      this.resetActions();
+    }
 
     // from UI event to list of actions
     this.eventMap = {
@@ -30,6 +52,10 @@ export default class EventRegistry {
 
   setActions(actionMap) {
     return Object.assign(this.actionMap || {}, actionMap);
+  }
+
+  resetActions() {
+    this.actionMap = {};
   }
 
   addAction(action, func) {
@@ -50,25 +76,29 @@ export default class EventRegistry {
   triggerActions() {
     const triggers = [];
     Object.keys(this.eventMap).map(eventType =>
-      this.eventMap[eventType].map(({event: event}) =>
+      this.eventMap[eventType].map(({ event }) =>
         event.active.map((ge, index, active) => {
-        const trigger = this.triggerAction(ge, index, active, triggers);
+          const trigger = this.triggerAction(ge, index, active, triggers);
           trigger && triggers.push(trigger);
         })
       )
     );
-    triggers.map(({action: action}) => this.actionMap[action]());
+    triggers.map(({ action }) => this.actionMap[action]());
   }
 
   // set mouse listener
   mouse(getDims, events, selfTrigger) {
-    return this.eventMap.mouse.push({event: this.mouseEvent(getDims, events), st: selfTrigger});
+    return this.eventMap.mouse.push({ event: this.mouseEvent(getDims, events), st: selfTrigger });
   }
 
   // set key listener
   // visit this website for keycodes: http://keycode.info/
   key(key, events, selfTrigger) {
-    return this.eventMap.key.push({event: this.keyEvent(key, events), st: selfTrigger}) - 1;
+    return this.eventMap.key.push({ event: this.keyEvent(_key => key === _key, events), st: selfTrigger }) - 1;
+  }
+
+  keys(keys, events, selfTrigger) {
+    return this.eventMap.key.push({ event: this.keyEvent(keys, events), st: selfTrigger }) - 1;
   }
 
   // remove listener
@@ -78,11 +108,16 @@ export default class EventRegistry {
 
   // remove listener
   removeEvents(type) {
-    return this.eventMap[type] = [];
+    if (type) {
+      this.eventMap[type] = [];
+    } else {
+      this.removeEvents('mouse');
+      this.removeEvents('key');
+    }
   }
 
   // create the mouse event data
-  mouseEvent(dims, { down: down, up: up, over: over, out: out }) {
+  mouseEvent(dims, { down, up, over, out }) {
     const getDims = (() => {
       if (dims && dims.constructor && dims.call && dims.apply)
         return () => dims();
@@ -91,10 +126,10 @@ export default class EventRegistry {
     })();
 
     return {
-      down: down,
-      up: up,
-      over: over,
-      out: out,
+      down,
+      up,
+      over,
+      out,
       activate(event) {
         const _dims = getDims();
         const isInside =
@@ -104,21 +139,21 @@ export default class EventRegistry {
           event.offsetY < _dims.h + _dims.y;
         const active = [];
         if (event.button === 0 && isInside) {
-          if(event.type === "mouseup") {
-            if(up) {
-              active.push({action: up, run: 1});
+          if (event.type === "mouseup") {
+            if (up) {
+              active.push({ action: up, run: 1 });
             }
           } else if (event.type === "mousedown") {
-            if(down) {
-              active.push({action: down, run: true});
+            if (down) {
+              active.push({ action: down, run: true });
             }
           }
         }
-        if(event.type === "mousemove") {
-          if (isInside && over){
-            active.push({action: over, run: true});
+        if (event.type === "mousemove") {
+          if (isInside && over) {
+            active.push({ action: over, run: true });
           } else if (!isInside && out) {
-            active.push({action: out, run: true});
+            active.push({ action: out, run: true });
           }
         }
         this.active = active;
@@ -128,17 +163,17 @@ export default class EventRegistry {
   }
 
   // create the key event data
-  keyEvent(key, {down: down, up: up}) {
+  keyEvent(keys, { down, up }) {
     return {
-      key: key,
+      keys: keys,
       down: down,
       up: up,
       activate(event) {
-        if(event.which === key) {
+        if (keys(event.which)) {
           const isUp = event.type === 'keyup';
           const active = [];
-          !isUp && down && active.push({action: down, run: true});
-          isUp && up && active.push({action: up, run: 1});
+          !isUp && down && active.push({ action: down, run: true });
+          isUp && up && active.push({ action: up, run: 1 });
           this.active = active;
         }
       },

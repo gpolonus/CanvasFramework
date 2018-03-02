@@ -33,4 +33,51 @@ function mod(n, p) {
   return ((n % p) + p) % p;
 }
 
-export {render, random, log, once, mod};
+function animate(step, done) {
+  let going = true;
+  return (...args) => {
+    if(going)
+      going = step(...args);
+    else
+      done();
+  };
+}
+
+function distance({ x: x0, y: y0 }, { x: x1, y: y1 }) {
+  return Math.sqrt((x0 - x1) ** 2 + (y0 - y1) ** 2);
+}
+
+function inRange({x: x0, y: y0}, {x: x1, y: y1}, radius) {
+  return (x0 - x1)**2 + (y0 - y1)**2 <= radius**2
+}
+
+function p(x, y) {
+  return {x, y};
+}
+
+function animateLine(
+    {x: x0, y: y0},
+    {x: x1, y: y1},
+    speed,
+    draw,
+    done,
+  ) {
+  let current = {x: x0, y: y0};
+  return animate((du) => {
+    const {x, y} = current;
+    const dist = distance(current, p(x1, y1));
+    if(dist < speed) {
+      draw(du, p(x1, y1));
+      return false;
+    }
+    const speedCoeff = speed / dist;
+    current = {
+      x: (x1 - x) * speedCoeff + current.x,
+      y: (y1 - y) * speedCoeff + current.y
+    };
+    draw(du, current);
+    return true;
+  }, done);
+}
+
+export {render, random, log, once, mod, animate, animateLine};
