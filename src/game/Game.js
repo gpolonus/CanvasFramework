@@ -1,8 +1,9 @@
 
 import Board from './Board';
 import Player from './Player';
-import { mod, log } from '../functions';
+import { mod, log, animateLine, random } from '../functions';
 import Steps from '../objects/Steps';
+import DrawingStack from '../utils/DrawingStack';
 
 export default class Game {
   constructor() {
@@ -15,6 +16,8 @@ export default class Game {
 
     this.player = new Player(this.board.spots[0]);
 
+    this.ds = new DrawingStack();
+
     // roll a die
     // go to a spot or roll again
     // get a color
@@ -24,7 +27,8 @@ export default class Game {
 
   start(er) {
     // TODO try to make the er get passed around functionally?
-    this.getStart(er, this.board, this.player);
+    // TODO implement IMMUTABLE.js and REDUX for state
+    this.getStart(er, this.ds, this.board, this.player);
   }
 
   makeBoard() {
@@ -44,40 +48,34 @@ export default class Game {
     return b;
   }
 
-  getStart(er, b, p) {
+  getStart(er, ds, b, p) {
     const steps = new Steps();
-    this.addStartStep(er, b, p, steps);
+    this.addStartStep(er, ds, b, p, steps);
     this.addWinStep(p, steps);
     steps['start'].init();
   }
 
-  addStartStep(er, b, p, steps) {
+  addStartStep(er, ds, b, p, steps) {
     steps.add('start', 
-        step => {
-          // roll
-          log('Roll them dice!', true);
-        const moveNext = num => {
-          er.setActions({});
-          er.eventMap.key = [];
-          step.next(num);
-        };
+      step => {
+        // roll
+        log('Roll them dice! (Press Space)', true);
         er.setActions({
-          '1': () => moveNext(1),
-          '2': () => moveNext(2),
-          '3': () => moveNext(3),
-          '4': () => moveNext(4),
-          '5': () => moveNext(5),
-          '6': () => moveNext(6),
+          'roll': () => {
+            const roll = random(5) + 1;
+            log('Rolled a ' + roll + '!');
+            er.removeEvents();
+            er.resetActions();
+            const newIndex = mod(roll + p.spot.id, this.colors.length);
+            this.moveToNext(p, b, ds, newIndex, () => step.next(newIndex));
+          }
         });
-        this.colors.map((c, i) => {
-          er.key(i + 49, { 'up': '' + (i + 1) });
-        });
+        er.key(32, { 'up': 'roll'});
       },
       num => {
         // move and check effects
-        const newIndex = mod(num + p.spot.id, this.colors.length);
-        const newSpot = b.spots[newIndex];
-        log('Moved to ' + newIndex + 'th spot!', true);
+        const newSpot = b.spots[num];
+        log('Moved to ' + num + 'th spot!', true);
         p.spot = newSpot;
         if (!p.colors.find(c => c === p.spot.color)) {
           p.colors.push(p.spot.color);
@@ -114,8 +112,34 @@ export default class Game {
     );
   }
 
+  moveToNext(p, b, ds, endSpotIndex, done) {
+    let prevSpot = p.spot;
+    let nextSpot = b.spots[p.spot.adj[0]];
+    const getAnimateLine = () => animateLine(
+      prevSpot,
+      nextSpot,
+      1,
+      (du, current) => {
+        p.spot = current;
+      },
+      () => {
+        if (nextSpot.id === endSpotIndex) {
+          ds.remove('moving');
+          done();
+        } else {
+          ds.remove('moving');
+          prevSpot = nextSpot;
+          nextSpot = b.spots[prevSpot.adj[0]];
+          ds.push('moving', getAnimateLine());
+        }
+      }
+    );
+    ds.push('moving', getAnimateLine());
+  }
+
   draw(du) {
     this.board.draw(du);
     this.player.draw(du);
+    this.ds.draw(du);
   }
 }

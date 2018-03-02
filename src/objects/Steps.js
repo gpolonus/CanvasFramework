@@ -6,7 +6,7 @@ export default class Steps {
     this[key] = new Step(key, init);
     this[key].next = (...args) => {
       const nextKey = next(...args);
-      this[nextKey].init()
+      nextKey && this[nextKey].init();
     };
     return this[key];
   }
@@ -15,10 +15,6 @@ export default class Steps {
 class Step {
   constructor(key, init) {
     this.key = key;
-    this._init = init;
-  }
-
-  init() {
-    this._init(this);
+    this.init = init.bind(this, this);
   }
 }
