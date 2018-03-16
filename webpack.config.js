@@ -23,6 +23,7 @@ module.exports = {
     extensions: ['.ts', '.js', '.json'],
     alias: {
       'jquery': 'jquery/dist/jquery.min.js',
+      'axios': 'axios/dist/axios.min.js',
     },
     modules: [
       'node_modules'

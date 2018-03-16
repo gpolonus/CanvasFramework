@@ -80,4 +80,13 @@ function animateLine(
   }, done);
 }
 
-export {render, random, log, once, mod, animate, animateLine};
+export {
+  render,
+  random,
+  log,
+  once,
+  mod,
+  animate,
+  animateLine,
+  p
+};

@@ -1,49 +1,104 @@
 
+export const DIRECTIONS = {
+  UP: 'up',
+  DOWN: 'down',
+  LEFT: 'left',
+  RIGHT: 'right'
+};
 
+class Board {
 
-export default class Board {
   constructor() {
     this.spots = [];
   }
 
-  static makeSpot(x, y, data) {
-    return new Spot(x, y, data);
+  makeSpot(id, data) {
+    this.spots[id] = new Spot(id, data);
+    return this.spots[id];
   }
 
   draw(du) {
-    this.spots.map((spot, i, list) => {
-      spot.adj.map(id => {
-        const adjSpot = list[id];
-        du.points([spot, adjSpot], 'black', 4);
-      });
-      return spot;
-    }).map(spot => spot.draw(du));
+    this.spots.map(spot => spot.draw(du));
   }
 }
+Board.LENGTH = 8;
+export default Board;
+
+
+// used by the spot class then applied statically
+const WIDTH = 25;
 
 class Spot {
 
-  constructor(x, y, data) {
+  constructor(id, boardLength, ...data) {
+    this.adj = [];
+    this.id = id;
+    const {i, j} = Spot.getLocation(id, boardLength);
+    this.x = WIDTH * i;
+    this.y = WIDTH * j;
+    this.setData(...data);
+  }
+
+  setLoc({x, y}) {
     this.x = x;
     this.y = y;
-    this.adj = [];
-    this.WIDTH = 15;
-    this.setData(data || {});
   }
 
-  setData({color: color, id: id}) {
-    this.color = color;
-    this.id = id;
+  setData(dir) {
+    this.dir = dir;
   }
 
-  setAdj(ids) {
-    this.adj = [...ids];
+  static getLocation(id, size) {
+    const i = id % size;
+    const j = Math.floor(id / size);
+    return {i, j};
+  }
+
+  setAdj(adj) {
+    this.adj = adj;
   }
 
   draw(du) {
-    const w2 = this.WIDTH / 2;
-    const args = [this.x - w2, this.y - w2, this.WIDTH, this.WIDTH];
-    du.rectangle(...args, this.color);
-    du.box(...args, 'black', 2);
+    const widthOverTwo = WIDTH / 2;
+    let points;
+    const p = (x, y) => ({x, y});
+    const dir = this.dir || this.tempDir;
+    switch(dir) {
+      case 'up':
+        points = [
+          p(this.x - widthOverTwo, this.y + widthOverTwo),
+          p(this.x + widthOverTwo, this.y + widthOverTwo),
+          p(this.x, this.y - widthOverTwo),
+        ];
+        break;
+      case 'down':
+        points = [
+          p(this.x - widthOverTwo, this.y - widthOverTwo),
+          p(this.x + widthOverTwo, this.y - widthOverTwo),
+          p(this.x, this.y + widthOverTwo)
+        ];
+        break;
+      case 'left':
+        points = [
+          p(this.x + widthOverTwo, this.y - widthOverTwo),
+          p(this.x + widthOverTwo, this.y + widthOverTwo),
+          p(this.x - widthOverTwo, this.y)
+        ];
+        break;
+      case 'right':
+        points = [
+          p(this.x - widthOverTwo, this.y - widthOverTwo),
+          p(this.x - widthOverTwo, this.y + widthOverTwo),
+          p(this.x + widthOverTwo, this.y)
+        ];
+        break;
+      default:
+        points = [];
+    }
+    du.rectangle(this.x - widthOverTwo, this.y - widthOverTwo, WIDTH, WIDTH, 'white');
+    du.points(points, 'black', this.dir ? 3 : 1, true);
   }
 }
+
+Spot.WIDTH = WIDTH;
+export {Spot};

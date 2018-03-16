@@ -115,6 +115,9 @@ export default class CanvasUtil {
   }
 
   points(points, color, lineWidth, connect) {
+    if(points.length === 0) {
+      return;
+    }
     const ctx = this.context;
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = color;

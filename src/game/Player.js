@@ -1,15 +1,30 @@
 
+import CommunicationService from '../objects/CommuncationService';
 
+const WIDTH = 10;
 
-export default class Player {
-  constructor(spot) {
-    this.spot = spot;
-    this.WIDTH = 10;
-    this.colors = [];
+class Player {
+
+  constructor(data) {
+    Object.assign(this, data);
+    if(data.local) {
+      this.cs = new CommunicationService();
+    }
   }
 
-  draw(du, {x, y} = {x: this.spot.x, y: this.spot.y}) {
-    const w2 = this.WIDTH / 2;
-    du.rectangle(x - w2, y - w2, this.WIDTH, this.WIDTH, 'black');
+  draw(du, {x, y} = {x: this.loc.x, y: this.loc.y}) {
+    const w2 = WIDTH / 2;
+    du.rectangle(x - w2, y - w2, WIDTH, WIDTH, 'black');
+  }
+
+  retrieveMessage() {
+
+  }
+
+  sendMessage() {
+
   }
 }
+
+Player.WIDTH = WIDTH;
+export default Player;

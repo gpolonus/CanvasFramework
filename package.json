@@ -15,6 +15,8 @@
   "author": "Griffin Polonus",
   "license": "ISC",
   "dependencies": {
+    "@rematch/core": "^0.4.1",
+    "axios": "^0.18.0",
     "jquery": "^3.3.1",
     "simple-peer": "^8.5.0"
   },

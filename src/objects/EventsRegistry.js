@@ -86,6 +86,10 @@ export default class EventRegistry {
     triggers.map(({ action }) => this.actionMap[action]());
   }
 
+  listen({type, bounds, events, st}) {
+    this[type] && this[type](bounds, events, st);
+  }
+
   // set mouse listener
   mouse(getDims, events, selfTrigger) {
     return this.eventMap.mouse.push({ event: this.mouseEvent(getDims, events), st: selfTrigger });

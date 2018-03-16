@@ -1,4 +1,6 @@
 
+
+
 export default class DrawingUtil {
   constructor(canvasUtil, vp) {
     this.cu = canvasUtil;
@@ -29,11 +31,11 @@ export default class DrawingUtil {
     );
   }
 
-  points(points, color, lineWidth) {
+  points(points, color, lineWidth, connect) {
     color = color || 'black';
     lineWidth = lineWidth || 2;
     const scaledPoints = points.map(p => this.scalePoint(p.x, p.y));
-    this.cu.points(scaledPoints, color, lineWidth);
+    this.cu.points(scaledPoints, color, lineWidth, connect);
   }
 
   background(color) {
