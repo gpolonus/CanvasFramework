@@ -1,5 +1,5 @@
 
-export default {
+const vpl = {
   x: 0,
   y: 0,
   changing: () => false,
@@ -14,7 +14,7 @@ export default {
   },
   resetVPL: () => {
     this.a.changing = this.a._changing;
-    this.a._done = () => { };
+    this.a._done = () => {};
     this.a.goto = false;
     this.a.setting = false;
   },
@@ -23,3 +23,5 @@ export default {
     this.a.resetVPL();
   }
 };
+
+export default vpl;

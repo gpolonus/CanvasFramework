@@ -114,13 +114,13 @@ export default class CanvasUtil {
     this.context.strokeRect(x, y, w, h);
   }
 
-  points(points, color, lineWidth, connect) {
+  points(points, color, lineWidth, connect, fill) {
     if(points.length === 0) {
       return;
     }
     const ctx = this.context;
     ctx.lineWidth = lineWidth;
-    ctx.strokeStyle = color;
+    fill ? ctx.fillStyle = color : ctx.strokeStyle = color;
     ctx.beginPath();
     ctx.moveTo(points[0].x, points[0].y);
     let i = 1;
@@ -129,7 +129,14 @@ export default class CanvasUtil {
     });
     if(connect)
       ctx.lineTo(points[0].x, points[0].y);
-    ctx.stroke();
+    fill ? ctx.fill() : ctx.stroke();
+  }
+
+  text(text, x, y, font, color) {
+    const ctx = this.context;
+    ctx.font = font;
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
   }
 
   static getViewSquare() {

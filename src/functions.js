@@ -36,10 +36,13 @@ function mod(n, p) {
 function animate(step, done) {
   let going = true;
   return (...args) => {
-    if(going)
+    if(going) {
       going = step(...args);
-    else
+      return true;
+    } else {
       done();
+      return false;
+    }
   };
 }
 
@@ -80,6 +83,12 @@ function animateLine(
   }, done);
 }
 
+const randomColor  = () => {
+  return '#' + random(255).toString(16) + 
+    random(255).toString(16) +
+    random(255).toString(16);
+}
+
 export {
   render,
   random,
@@ -88,5 +97,6 @@ export {
   mod,
   animate,
   animateLine,
-  p
+  p,
+  randomColor
 };

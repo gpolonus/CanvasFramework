@@ -8,7 +8,8 @@ import VPL from '../objects/ViewPortLocation';
 
 export default class Game {
   constructor(playerService) {
-    const board = this.makeBoard();
+    const boardSideLength = 5;
+    const board = this.makeBoard(boardSideLength);
     playerService.players = playerService.players.map(p => {
       p.spot = board.spots[random(board.spots.length - 1)];
       p.loc = { x: p.spot.x, y: p.spot.y };
@@ -38,15 +39,15 @@ export default class Game {
     this._start(er, this.ds, this.board, this.ps, du);
   }
 
-  makeBoard() {
-    const b = new Board();
-    Array(Board.LENGTH ** 2).fill().map((_, index) => {
-      const spot = b.makeSpot(index, Board.LENGTH);
+  makeBoard(l) {
+    const b = new Board(l);
+    Array(b.length ** 2).fill().map((_, index) => {
+      const spot = b.makeSpot(index, b.length);
       spot.setAdj({
-        up: index - Board.LENGTH,
-        down: index + Board.LENGTH,
-        left: index - 1,
-        right: index + 1
+        up: index < b.length ? null : index - b.length,
+        down: index + 1 > b.length ** 2 - b.length ? null : index + b.length,
+        left: index % b.length === 0 ? null : index - 1,
+        right: index % b.length === b.length -1 ? null : index + 1
       });
     });
     return b;
@@ -70,7 +71,14 @@ export default class Game {
             log('Rolled a ' + roll + '!');
             er.removeEvents();
             er.resetActions();
-            this.moveToNext(ps, b, ds, er, du, roll, () => step.next());
+            this.moveToNext(ps, b, ds, er, du, roll,
+              () => {
+                const loop = b.isLoop(ps.current().spot);
+                loop.map(spotId => b.spots[spotId].dir = null);
+                ps.current().points += loop.length ** 2 / 2;
+              },
+              () => step.end()
+            );
           }
         };
         const listener = {
@@ -80,8 +88,8 @@ export default class Game {
         };
         ps.action(er, actions, listener);
       },
-      num => {
-        return 'win-test';
+      step => {
+        step.next('win-test');
       },
     );
   }
@@ -89,23 +97,26 @@ export default class Game {
   addWinStep(ps, steps) {
     steps.add('win-test',
       step => {
-        step.next();
+        step.end();
       },
       async (step) => {
         // test the win
-        const win = false;
+        const win = ps.current().points >= 100;
         if (win) {
           log('You win!', true);
         } else {
           log('You haven\'t won yet!', true);
-          await ps.next();
-          return 'start';
+          ps.next();
+          const loc = ps.current().loc;
+          VPL.set(loc.x, loc.y, 'goto', () => {
+            step.next('start');
+          });
         }
       }
     );
   }
 
-  async moveToNext(ps, b, ds, er, du, numChoices, done) {
+  async moveToNext(ps, b, ds, er, du, numChoices, each, done) {
     let choicesLeft = numChoices;
     let prevSpot = ps.current().spot;
     let nextSpot = await this.getNextSpot(ps, b, er, du);
@@ -119,13 +130,13 @@ export default class Game {
       },
       async () => {
         ps.current().spot = nextSpot;
+        each();
         if (--choicesLeft == 0) {
           ds.remove('moving');
           done();
         } else {
           ds.remove('moving');
           prevSpot = nextSpot;
-          // nextSpot = b.spots[prevSpot.adj[0]];
           nextSpot = await this.getNextSpot(ps, b, er, du);
           ds.push('moving', getAnimateLine());
         }
@@ -150,19 +161,23 @@ export default class Game {
       // make the options
       const moveChoices = {};
       let moveListeners = [];
-      Object.entries(prevSpot.adj).map(([kind, spotId]) => {
-        if(!b.spots[spotId]) return; 
+      Object.entries(prevSpot.adj).map(([kind, spotId], _, list) => {
+        if(!b.spots[spotId]) return;
         const spot = b.spots[spotId];
+        spot.kindaLit = true;
         moveChoices['over-' + spotId] = () => {
-          spot.tempDir = kind;
-          prevSpot.tempDir = kind;
+          spot.lit = true;
+          prevSpot.dir = kind;
         };
         moveChoices['out-' + spotId] = () => {
-          spot.tempDir = null;
-          prevSpot.tempDir = null;
+          spot.lit = false;
         };
         moveChoices['up-' + spotId] = () => {
-          spot.tempDir = null;
+          list.map(([__, _spotId]) => {
+            if (!b.spots[_spotId]) return;
+            b.spots[_spotId].lit = false;
+            b.spots[_spotId].kindaLit = false;
+          })
           prevSpot.dir = kind;
           er.resetActions();
           er.removeEvents();
@@ -184,7 +199,6 @@ export default class Game {
   }
 
   draw(du, changeViewPort, setViewPort) {
-    console.log(VPL);
     if(VPL.goto) {
       VPL.changing = changeViewPort(VPL);
       VPL.goto = false;

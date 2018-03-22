@@ -8,7 +8,8 @@ export const DIRECTIONS = {
 
 class Board {
 
-  constructor() {
+  constructor(length) {
+    this.length = length;
     this.spots = [];
   }
 
@@ -17,11 +18,28 @@ class Board {
     return this.spots[id];
   }
 
+  isLoop(spot) {
+    const check = (spot, spotIds) => {
+      const next = this.spots[spot.adj[spot.dir]];
+      if(!next || !next.dir) {
+        return [];
+      } else if(spotIds.find(id => id === next.id)) {
+        return spotIds;
+      } else {
+        spotIds = [...spotIds, next.id];
+        return check(next, spotIds);
+      }
+    }
+    return check(this.spots[spot.id], []);
+  }
+
   draw(du) {
+    const widthOverTwo = Spot.WIDTH / 2;
+    const boardLength = this.length * Spot.WIDTH;
+    du.rectangle(this.spots[0].x - widthOverTwo, this.spots[0].y - widthOverTwo, boardLength, boardLength, 'white');
     this.spots.map(spot => spot.draw(du));
   }
 }
-Board.LENGTH = 8;
 export default Board;
 
 
@@ -37,6 +55,7 @@ class Spot {
     this.x = WIDTH * i;
     this.y = WIDTH * j;
     this.setData(...data);
+    this.lit = false;
   }
 
   setLoc({x, y}) {
@@ -62,8 +81,7 @@ class Spot {
     const widthOverTwo = WIDTH / 2;
     let points;
     const p = (x, y) => ({x, y});
-    const dir = this.dir || this.tempDir;
-    switch(dir) {
+    switch(this.dir) {
       case 'up':
         points = [
           p(this.x - widthOverTwo, this.y + widthOverTwo),
@@ -95,8 +113,9 @@ class Spot {
       default:
         points = [];
     }
-    du.rectangle(this.x - widthOverTwo, this.y - widthOverTwo, WIDTH, WIDTH, 'white');
-    du.points(points, 'black', this.dir ? 3 : 1, true);
+    this.kindaLit && du.rectangle(this.x - widthOverTwo, this.y - widthOverTwo, WIDTH, WIDTH, '#ddd');
+    du.box(this.x - widthOverTwo, this.y - widthOverTwo, WIDTH, WIDTH, 'black', this.lit ? 3 : 1);
+    du.points(points, 'black', 1, true);
   }
 }
 

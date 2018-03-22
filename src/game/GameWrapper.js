@@ -8,11 +8,11 @@ const init = async (er, cu, du) => {
   const ps = new PlayerService();
   await ps.fetchPlayers();
   const game = new Game(ps);
-  game.start(er, du);
   const triggers = {
     'start': () => {
       er.removeEvents('mouse');
-      startRender(game, er, cu, du);
+      game.start(er, du);
+      startRender(game, er, cu, du, ps);
     },
     'over-start': () => {
       drawStart(cu, true);
@@ -30,7 +30,7 @@ const init = async (er, cu, du) => {
   drawStart(cu);
 };
 
-const startRender = (game, er, cu, du) => {
+const startRender = (game, er, cu, du, ps) => {
   render(() => {
     // always trigger events first
     er.triggerActions();
@@ -38,20 +38,18 @@ const startRender = (game, er, cu, du) => {
     // draw background before drawing other things
     du.background('#bbb');
 
+
     // always set the viewport before drawing other things
     // else animation errors occur
-    // du.vp.set({
-    //   x: corner.x,
-    //   y: corner.y,
-    // });
+
 
     // draw things
     game.draw(du, ({x, y, done}) => {
-      const oldSpot = p(du.vp.x, du.vp.y);
+      const oldSpot = du.vp.center();
       return animateLine(
         oldSpot,
         p(x, y),
-        3,
+        2,
         (_, {x: x1, y: y1}) => {
           du.vp.set({
             x: x1 - du.vp.w / 2,
@@ -68,8 +66,20 @@ const startRender = (game, er, cu, du) => {
         y: y - du.vp.h / 2,
       });
     });
+
   });
 };
+
+const drawStatus = () => {
+  // draw status things about players and game control buttons
+  ps.players.map((p, i) => {
+    // text height
+    const th = 25;
+    // line spacing
+    const ls = 10;
+    cu.text(p.name + ': ' + p.points, 0, 2 * ls + i * th, th + "px Arial", "black");
+  });
+}
 
 const drawStart = (cu, over) => {
   cu.background('grey');
@@ -89,8 +99,5 @@ const buttonDims = ({ dims: dims }) => {
 };
 
 export default {
-  init,
-  startRender,
-  drawStart,
-  buttonDims
+  init
 };

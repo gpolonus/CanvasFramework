@@ -31,11 +31,11 @@ export default class DrawingUtil {
     );
   }
 
-  points(points, color, lineWidth, connect) {
+  points(points, color, lineWidth, connect, fill) {
     color = color || 'black';
     lineWidth = lineWidth || 2;
     const scaledPoints = points.map(p => this.scalePoint(p.x, p.y));
-    this.cu.points(scaledPoints, color, lineWidth, connect);
+    this.cu.points(scaledPoints, color, lineWidth, connect, fill);
   }
 
   background(color) {
