@@ -98,5 +98,6 @@ export {
   animate,
   animateLine,
   p,
+  inRange,
   randomColor
 };

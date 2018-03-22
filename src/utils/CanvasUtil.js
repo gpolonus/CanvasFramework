@@ -1,4 +1,4 @@
-import Point from '../objects/Point';
+
 
 export default class CanvasUtil {
 

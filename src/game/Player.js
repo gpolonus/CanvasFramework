@@ -22,23 +22,23 @@ class Player {
     switch (this.spot.dir) {
       case 'up':
         du.points([
-          p(this.loc.x - w2, this.loc.y + w2),
-          p(this.loc.x + w2, this.loc.y + w2),
-          p(this.loc.x, this.loc.y - w2),
+          p(x - w2, y + w2),
+          p(x + w2, y + w2),
+          p(x, y - w2),
         ], ...args);
         break;
       case 'down':
         du.points([
-          p(this.loc.x - w2, this.loc.y - w2),
-          p(this.loc.x + w2, this.loc.y - w2),
-          p(this.loc.x, this.loc.y + w2)
+          p(x - w2, y - w2),
+          p(x + w2, y - w2),
+          p(x, y + w2)
         ], ...args);
         break;
       case 'left':
         du.points([
-          p(this.loc.x + w2, this.loc.y - w2),
-          p(this.loc.x + w2, this.loc.y + w2),
-          p(this.loc.x - w2, this.loc.y)
+          p(x + w2, y - w2),
+          p(x + w2, y + w2),
+          p(x - w2, y)
         ], ...args);
         break;
       case 'right':

@@ -2,7 +2,6 @@
 import { render, animateLine, p } from '../functions';
 import Game from './Game';
 import PlayerService from '../objects/PlayerService'
-import SignIn from '../objects/SignIn';
 
 const init = async (er, cu, du) => {
   const ps = new PlayerService();
@@ -70,26 +69,26 @@ const startRender = (game, er, cu, du, ps) => {
   });
 };
 
-const drawStatus = () => {
-  // draw status things about players and game control buttons
-  ps.players.map((p, i) => {
-    // text height
-    const th = 25;
-    // line spacing
-    const ls = 10;
-    cu.text(p.name + ': ' + p.points, 0, 2 * ls + i * th, th + "px Arial", "black");
-  });
-}
+// const drawStatus = () => {
+//   // draw status things about players and game control buttons
+//   ps.players.map((p, i) => {
+//     // text height
+//     const th = 25;
+//     // line spacing
+//     const ls = 10;
+//     cu.text(p.name + ': ' + p.points, 0, 2 * ls + i * th, th + "px Arial", "black");
+//   });
+// }
 
 const drawStart = (cu, over) => {
   cu.background('grey');
-  const { x: x, y: y, w: w, h: h } = buttonDims(cu);
+  const {x, y, w, h } = buttonDims(cu);
   cu.rectangle(x, y, w, h, 'white');
   if (over) cu.box(x, y, w, h, 'black', 10);
 };
 
-const buttonDims = ({ dims: dims }) => {
-  const { left: x, top: y, width: w, height: h } = dims;
+const buttonDims = ({ dims }) => {
+  const { width: w, height: h } = dims;
   return {
     x: w / 4,
     y: h / 4,

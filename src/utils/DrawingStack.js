@@ -1,5 +1,5 @@
 export default class DrawingStack {
-  constructor(du) {
+  constructor() {
     this.stack = {};
   }
 

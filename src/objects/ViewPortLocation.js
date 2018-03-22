@@ -9,7 +9,7 @@ const vpl = {
   set: (x, y, type, done) => {
     this.a.x = x;
     this.a.y = y;
-    if(type == 'goto') this.a._done = done;
+    if(type === 'goto') this.a._done = done;
     this.a[type] = true;
   },
   resetVPL: () => {

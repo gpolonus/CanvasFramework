@@ -59,7 +59,6 @@ class PlayerService {
 
   action(er, actions, ...listeners) {
     const currentPlayer = this.current();
-    let p;
     er.setActions(actions);
     if(currentPlayer.local) {
       // use the er

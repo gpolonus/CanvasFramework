@@ -1,12 +1,9 @@
 
-import {render, random, log, once} from './functions';
 import CanvasUtil from './utils/CanvasUtil';
 import Viewport from './objects/Viewport';
 import DrawingUtil from './utils/DrawingUtil';
-import Game from './game/Game';
 import GameWrapper from './game/GameWrapper';
 import EventRegistry from './objects/EventsRegistry';
-import axios from 'axios';
 
 const init = () => {
   const canvas = document.createElement('canvas');
