@@ -1,6 +1,5 @@
-import axios from 'axios';
 import SignIn from './SignIn';
-import Player from '../game/Player'
+import Player from '../game/Player';
 import { mod } from '../functions';
 
 const getPlayersUrl = '';
@@ -70,6 +69,11 @@ class PlayerService {
         actions[action]();
       });
     }
+  }
+
+  map(func) {
+    const players = this.players || [];
+    return players.map(func);
   }
 }
 

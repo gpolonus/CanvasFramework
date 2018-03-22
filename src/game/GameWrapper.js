@@ -1,11 +1,8 @@
 
 import { render, animateLine, p } from '../functions';
 import Game from './Game';
-import PlayerService from '../objects/PlayerService'
 
-const init = async (er, cu, du) => {
-  const ps = new PlayerService();
-  await ps.fetchPlayers();
+const init = async (er, cu, du, ps) => {
   const game = new Game(ps);
   const triggers = {
     'start': () => {

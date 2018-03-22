@@ -21,8 +21,6 @@
     "simple-peer": "^8.5.0"
   },
   "devDependencies": {
-    "cra-hyperapp": "0.0.5",
-    "webpack": "^3.10.0",
-    "webpack-dev-server": "^2.9.7"
+    "cra-hyperapp": "0.0.5"
   }
 }
