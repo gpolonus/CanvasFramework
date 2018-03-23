@@ -33,9 +33,10 @@ export default class Game {
       // when you encounter a loop, the loop is wiped, but you end your turn?
   }
 
-  start(er, du) {
+  start(er, du, statusChange) {
     // TODO try to make the er get passed around functionally?
     // TODO implement IMMUTABLE.js and REDUX for state
+    this.statusChange = statusChange;
     this._start(er, this.ds, this.board, this.ps, du);
   }
 
@@ -76,6 +77,7 @@ export default class Game {
                 const loop = b.isLoop(ps.current().spot);
                 loop.map(spotId => b.spots[spotId].dir = null);
                 ps.current().points += loop.length ** 2 / 2;
+                if(loop.length > 0) this.statusChange();
               },
               () => step.end()
             );
@@ -101,7 +103,8 @@ export default class Game {
       },
       async (step) => {
         // test the win
-        const win = ps.current().points >= 100;
+        // const win = ps.current().points >= 100;
+        const win = false;
         if (win) {
           log('You win!', true);
         } else {
@@ -148,7 +151,9 @@ export default class Game {
   async getNextSpot(ps, b, er, du) {
     const spot = ps.current().spot;
     if(spot.dir) {
-      return b.spots[spot.adj[spot.dir]];
+      const nextSpot = b.spots[spot.adj[spot.dir]];
+      if(ps.players.find(p => p.spot.id === nextSpot.id)) return spot;
+      else return nextSpot;
     } else {
       return await this.chooseNextSpot(ps, b, er, du);
     }
@@ -162,7 +167,7 @@ export default class Game {
       const moveChoices = {};
       let moveListeners = [];
       Object.entries(prevSpot.adj).map(([kind, spotId], _, list) => {
-        if(!b.spots[spotId]) return;
+        if(!b.spots[spotId] || ps.players.find(p => p.spot.id === spotId)) return;
         const spot = b.spots[spotId];
         spot.kindaLit = true;
         moveChoices['over-' + spotId] = () => {
@@ -177,7 +182,7 @@ export default class Game {
             if (!b.spots[_spotId]) return;
             b.spots[_spotId].lit = false;
             b.spots[_spotId].kindaLit = false;
-          })
+          });
           prevSpot.dir = kind;
           er.resetActions();
           er.removeEvents();

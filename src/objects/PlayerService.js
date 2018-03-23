@@ -67,6 +67,7 @@ class PlayerService {
     } else {
       // listen for player communications
       currentPlayer.retrieveMessage().then(message => {
+        // some processing of message here
         const action = message;
         actions[action]();
       });

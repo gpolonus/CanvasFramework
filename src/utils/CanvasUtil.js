@@ -99,6 +99,10 @@ export default class CanvasUtil {
     this.ctx = ctx;
   }
 
+  clear() {
+    this.context.clearRect(0, 0, this.dims.width, this.dims.height);
+  }
+
   background(color) {
     this.rectangle(0, 0, window.innerWidth, window.innerHeight, color);
   }

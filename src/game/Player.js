@@ -14,6 +14,7 @@ class Player {
     this.dir = 'up';
     this.points = 0;
     this.color = randomColor();
+    this.host = false;
   }
 
   draw(du, {x, y} = {x: this.loc.x, y: this.loc.y}) {

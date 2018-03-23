@@ -83,10 +83,11 @@ function animateLine(
   }, done);
 }
 
-const randomColor  = () => {
-  return '#' + random(255).toString(16) + 
-    random(255).toString(16) +
-    random(255).toString(16);
+const randomColor = () => {
+  return '#' +
+    random(255).toString(16).padStart(2, '0') +
+    random(255).toString(16).padStart(2, '0') +
+    random(255).toString(16).padStart(2, '0');
 }
 
 export {
