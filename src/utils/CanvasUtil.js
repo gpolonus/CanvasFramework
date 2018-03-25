@@ -10,7 +10,7 @@ export default class CanvasUtil {
 
   setViewOptions(options) {
     const paneView = options ? options.paneView : options;
-    const responsive = options.responsive;
+    const responsive = options ? options.responsive : false;
 
     if (responsive) {
       window.addEventListener('resize', () => {
@@ -35,25 +35,40 @@ export default class CanvasUtil {
   }
 
   getPaneView(px) {
-    let suffix = '';
     if (px) {
-      suffix = 'px'
-    }
-    if (this._paneView === 'full') {
-      return {
-        height: window.innerHeight + suffix,
-        width: window.innerWidth + suffix,
-        top: 0,
-        left: 0,
-      };
-    } else if (this._paneView === 'square') {
-      const dims = CanvasUtil.getViewSquare();
-      return {
-        height: dims.l + suffix,
-        width: dims.l + suffix,
-        top: dims.y + suffix,
-        left: dims.x + suffix,
-      };
+      if (this._paneView === 'full') {
+        return {
+          height: window.innerHeight + 'px',
+          width: window.innerWidth + 'px',
+          top: 0 + 'px',
+          left: 0 + 'px',
+        };
+      } else if (this._paneView === 'square') {
+        const dims = CanvasUtil.getViewSquare();
+        return {
+          height: dims.l + 'px',
+          width: dims.l + 'px',
+          top: dims.y + 'px',
+          left: dims.x + 'px',
+        };
+      }
+    } else {
+      if (this._paneView === 'full') {
+        return {
+          height: window.innerHeight,
+          width: window.innerWidth,
+          top: 0,
+          left: 0,
+        };
+      } else if (this._paneView === 'square') {
+        const dims = CanvasUtil.getViewSquare();
+        return {
+          height: dims.l,
+          width: dims.l,
+          top: dims.y,
+          left: dims.x,
+        };
+      }
     }
   }
 
@@ -97,6 +112,31 @@ export default class CanvasUtil {
     this.context.strokeStyle = color;
     this.context.lineWidth = lineWidth;
     this.context.strokeRect(x, y, w, h);
+  }
+
+  points(points, color, lineWidth, connect, fill) {
+    if(points.length === 0) {
+      return;
+    }
+    const ctx = this.context;
+    ctx.lineWidth = lineWidth;
+    fill ? ctx.fillStyle = color : ctx.strokeStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    let i = 1;
+    Array(points.length - 1).fill(1).map(() => {
+      ctx.lineTo(points[i].x, points[i++].y);
+    });
+    if(connect)
+      ctx.lineTo(points[0].x, points[0].y);
+    fill ? ctx.fill() : ctx.stroke();
+  }
+
+  text(text, x, y, font, color) {
+    const ctx = this.context;
+    ctx.font = font;
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
   }
 
   static getViewSquare() {

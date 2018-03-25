@@ -1,18 +1,24 @@
 
-import Vue from "vue";
-import ScoreBoardComponent from "./components/ScoreBoard";
-import Sand from "./components/Sand";
+import {render, random, log, once} from './functions';
+import CanvasUtil from './utils/CanvasUtil';
+import Viewport from './objects/Viewport';
+import DrawingUtil from './utils/DrawingUtil';
+import Game from './game/Game';
+import GameWrapper from './game/GameWrapper';
+import EventRegistry from './objects/EventsRegistry';
+import axios from 'axios';
 
-let v = new Vue({
-    el: "#app",
-    template: `
-    <div>
-        <component :is="currentComponent"></component>
-    </div>
-    `,
-    data: () => ({ currentComponent: Sand }),
-    components: {
-        ScoreBoardComponent,
-        Sand
-    }
-});
+const init = () => {
+  const canvas = document.createElement('canvas');
+  document.body.appendChild(canvas);
+
+  const cu = new CanvasUtil(canvas, { paneView: 'square' });
+  const vp = new Viewport({
+    x: -125, y: -125, w: 250, h: 250
+  });
+  const du = new DrawingUtil(cu, vp);
+  const er = new EventRegistry(canvas, {});
+  GameWrapper.init(er, cu, du);
+};
+
+init();
