@@ -1,7 +1,6 @@
 
 import Board, { Spot, DIRECTIONS } from './Board';
-import Player from './Player';
-import { mod, log, animateLine, random } from '../functions';
+import { log, animateLine, random } from '../functions';
 import Steps from '../objects/Steps';
 import DrawingStack from '../utils/DrawingStack';
 import VPL from '../objects/ViewPortLocation';
@@ -37,6 +36,7 @@ export default class Game {
     // TODO try to make the er get passed around functionally?
     // TODO implement IMMUTABLE.js and REDUX for state
     this.statusChange = statusChange;
+    // TODO use the directions object instead of strings
     this._start(er, this.ds, this.board, this.ps, du);
   }
 
@@ -134,7 +134,7 @@ export default class Game {
       async () => {
         ps.current().spot = nextSpot;
         each();
-        if (--choicesLeft == 0) {
+        if (--choicesLeft === 0) {
           ds.remove('moving');
           done();
         } else {

@@ -30,6 +30,7 @@ export default class SignIn {
   getName() {
     if(!this.state.showing) {
       this.init();
+      this.state.showing = true;
       return new Promise(resolve => {
         const input = () => document.querySelector('#signInContents input');
         const button = () => document.querySelector('#signInContents button');
@@ -40,14 +41,13 @@ export default class SignIn {
             this.testSubmit(input().value, resolve);
           }
         };
-        const clickHandler = event => {
+        const clickHandler = () => {
           this.testSubmit(input().value, resolve);
         };
 
         input().addEventListener('keyup', keyUpHandler);
         button().addEventListener('click', clickHandler);
       });
-      this.state.showing = true;
     } else {
       return new Promise(resolve => {
         resolve(false);

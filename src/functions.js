@@ -1,3 +1,5 @@
+
+
 function render(func) {
   const _run = () => {
     window.requestAnimationFrame(() => {
@@ -13,10 +15,10 @@ function random(num) {
 }
 
 function log(text, repeat) {
-  if(repeat)
-    document.getElementById('log').innerHTML += '<br><pre>' + text + '</pre>';
-  else
-    document.getElementById('log').innerHTML = '<pre>' + text + '</pre>';
+  // if(repeat)
+  //   document.getElementById('log').innerHTML += '<br><pre>' + text + '</pre>';
+  // else
+  //   document.getElementById('log').innerHTML = '<pre>' + text + '</pre>';
 }
 
 function once(func) {
@@ -99,5 +101,6 @@ export {
   animate,
   animateLine,
   p,
+  inRange,
   randomColor
 };

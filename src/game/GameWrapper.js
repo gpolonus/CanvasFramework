@@ -80,16 +80,16 @@ const startRender = (game, er, cu, du, ps) => {
   });
 };
 
-const drawStatus = () => {
-  // draw status things about players and game control buttons
-  ps.players.map((p, i) => {
-    // text height
-    const th = 25;
-    // line spacing
-    const ls = 10;
-    cu.text(p.name + ': ' + p.points, 0, 2 * ls + i * th, th + "px Arial", "black");
-  });
-}
+// const drawStatus = () => {
+//   // draw status things about players and game control buttons
+//   ps.players.map((p, i) => {
+//     // text height
+//     const th = 25;
+//     // line spacing
+//     const ls = 10;
+//     cu.text(p.name + ': ' + p.points, 0, 2 * ls + i * th, th + "px Arial", "black");
+//   });
+// }
 
 const drawStart = (cu, over) => {
   cu.background('grey');

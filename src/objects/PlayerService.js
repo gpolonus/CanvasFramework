@@ -1,6 +1,5 @@
-import axios from 'axios';
 import SignIn from './SignIn';
-import Player from '../game/Player'
+import Player from '../game/Player';
 import { mod } from '../functions';
 
 const getPlayersUrl = '';
@@ -59,7 +58,6 @@ class PlayerService {
 
   action(er, actions, ...listeners) {
     const currentPlayer = this.current();
-    let p;
     er.setActions(actions);
     if(currentPlayer.local) {
       // use the er
@@ -72,6 +70,11 @@ class PlayerService {
         actions[action]();
       });
     }
+  }
+
+  map(func) {
+    const players = this.players || [];
+    return players.map(func);
   }
 }
 
