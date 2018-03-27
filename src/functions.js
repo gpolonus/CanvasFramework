@@ -1,13 +1,17 @@
 
 
 function render(func) {
-  const _run = () => {
+  let _run = () => {
     window.requestAnimationFrame(() => {
       func();
       _run();
     });
   }
   _run();
+
+  return () => {
+    _run = () => {};
+  }
 }
 
 function random(num) {
@@ -92,12 +96,26 @@ const randomColor = () => {
     random(255).toString(16).padStart(2, '0');
 }
 
+const limit = (num, callback) => {
+  let vals = [];
+  let called = 0;
+  return (val) => {
+    if (called < num) {
+      vals = [...vals, val];
+      if (++called === num) {
+        callback(vals);
+      }
+    }
+  }
+}
+
 export {
   render,
   random,
   log,
   once,
   mod,
+  limit,
   animate,
   animateLine,
   p,

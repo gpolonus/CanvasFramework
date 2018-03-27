@@ -9,8 +9,8 @@ export default class CanvasUtil {
   }
 
   setViewOptions(options) {
-    const paneView = options ? options.paneView : options;
-    const responsive = options ? options.responsive : false;
+    const paneView = options.paneView ? options.paneView : options;
+    const responsive = options.responsive ? options.responsive : false;
 
     if (responsive) {
       window.addEventListener('resize', () => {

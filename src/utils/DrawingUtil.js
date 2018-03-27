@@ -1,10 +1,10 @@
 
-
+import ViewPort from '../objects/Viewport';
 
 export default class DrawingUtil {
   constructor(canvasUtil, vp) {
     this.cu = canvasUtil;
-    this.vp = vp;
+    this.vp = vp || this.getDefaultViewPort();
   }
 
   rectangle(x, y, w, h, color) {
@@ -57,5 +57,14 @@ export default class DrawingUtil {
       w: w / this.vp.w * this.cu.dims.width,
       h: h / this.vp.h * this.cu.dims.height,
     };
+  }
+
+  getDefaultViewPort() {
+    return new ViewPort({
+      x: 0,
+      y: 0,
+      w: this.cu.dims.width,
+      h: this.cu.dims.height
+    });
   }
 }
