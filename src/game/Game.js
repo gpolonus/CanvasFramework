@@ -1,6 +1,6 @@
 
-import Board, { Spot, DIRECTIONS } from './Board';
-import { log, animateLine, random } from '../functions';
+import Board, { Spot } from './Board';
+import { animateLine, random } from '../functions';
 import Steps from '../objects/Steps';
 import DrawingStack from '../utils/DrawingStack';
 import VPL from '../objects/ViewPortLocation';
@@ -50,6 +50,7 @@ export default class Game {
         left: index % b.length === 0 ? null : index - 1,
         right: index % b.length === b.length -1 ? null : index + 1
       });
+      return null;
     });
     return b;
   }
@@ -65,11 +66,9 @@ export default class Game {
     steps.add('start',
       step => {
         // roll
-        log('Roll them dice! (Press Space)', true);
         const actions = {
           'roll': () => {
             const roll = random(5) + 1;
-            log('Rolled a ' + roll + '!');
             er.removeEvents();
             er.resetActions();
             this.moveToNext(ps, b, ds, er, du, roll,
@@ -106,9 +105,7 @@ export default class Game {
         // const win = ps.current().points >= 100;
         const win = false;
         if (win) {
-          log('You win!', true);
         } else {
-          log('You haven\'t won yet!', true);
           ps.next();
           const loc = ps.current().loc;
           VPL.set(loc.x, loc.y, 'goto', () => {
@@ -167,7 +164,7 @@ export default class Game {
       const moveChoices = {};
       let moveListeners = [];
       Object.entries(prevSpot.adj).map(([kind, spotId], _, list) => {
-        if(!b.spots[spotId] || ps.players.find(p => p.spot.id === spotId)) return;
+        if(!b.spots[spotId] || ps.players.find(p => p.spot.id === spotId)) return null;
         const spot = b.spots[spotId];
         spot.kindaLit = true;
         moveChoices['over-' + spotId] = () => {
@@ -178,16 +175,18 @@ export default class Game {
           spot.lit = false;
         };
         moveChoices['up-' + spotId] = () => {
-          list.map(([__, _spotId]) => {
-            if (!b.spots[_spotId]) return;
+          list.map(([, _spotId]) => {
+            if (!b.spots[_spotId]) return null;
             b.spots[_spotId].lit = false;
             b.spots[_spotId].kindaLit = false;
+            return null;
           });
           prevSpot.dir = kind;
           er.resetActions();
           er.removeEvents();
           ps.current().sendMessage('up-' + spotId);
           resolve(b.spots[spotId]);
+          return null;
         };
         moveListeners = [...moveListeners,
           {
@@ -196,6 +195,7 @@ export default class Game {
             events: { up: 'up-' + spotId, over: 'over-' + spotId, out: 'out-' + spotId}
           }
         ];
+        return null;
       });
 
       // assign the choices

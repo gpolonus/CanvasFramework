@@ -11,7 +11,6 @@ class Player {
     if(data.local) {
       this.cs = new CommunicationService();
     }
-    this.dir = 'up';
     this.points = 0;
     this.color = randomColor();
     this.host = false;

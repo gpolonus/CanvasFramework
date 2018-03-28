@@ -11,29 +11,36 @@ export default class EventRegistry {
       this.eventMap.mouse.map(({ event: me, st }) => {
         me.activate(event);
         if (st) me.active.map(({ action: a }) => this.actionMap[a](event));
+        return null;
       });
     };
     el && 'mousedown mouseup mousemove'.split(' ').map(eventType => {
       el.addEventListener(eventType, mouseEvetHandler);
+      return null;
     });
 
     const keyEventHandler = event => {
       this.eventMap.key.map(({ event: ke, st }) => {
         ke.activate(event);
         if (st) ke.active.map(({ action: a }) => this.actionMap[a](event));
+        return null;
       });
+      return null;
     };
     'keydown keyup'.split(' ').map(eventType => {
       document.body.addEventListener(eventType, keyEventHandler);
+      return null;
     });
 
     this.stopListening = () => {
       'keydown keyup'.split(' ').map(eventType => {
         document.body.removeEventListener(eventType, keyEventHandler);
+        return null;
       });
 
       el && 'mousedown mouseup mousemove'.split(' ').map(eventType => {
         el.removeEventListener(eventType, mouseEvetHandler);
+        return null;
       });
 
       this.removeEvents();
@@ -80,6 +87,7 @@ export default class EventRegistry {
         event.active.map((ge, index, active) => {
           const trigger = this.triggerAction(ge, index, active, triggers);
           trigger && triggers.push(trigger);
+          return null;
         })
       )
     );

@@ -15,22 +15,15 @@ function render(func) {
 }
 
 function random(num) {
-  return Math.round(Math.random() * num);
-}
-
-function log(text, repeat) {
-  // if(repeat)
-  //   document.getElementById('log').innerHTML += '<br><pre>' + text + '</pre>';
-  // else
-  //   document.getElementById('log').innerHTML = '<pre>' + text + '</pre>';
+  return Math.floor(Math.random() * (num + 1));
 }
 
 function once(func) {
   let i = true;
-  return () => {
+  return (...args) => {
     if(i) {
-      func();
       i = false;
+      func(...args);
     }
   }
 }
@@ -99,11 +92,11 @@ const randomColor = () => {
 const limit = (num, callback) => {
   let vals = [];
   let called = 0;
-  return (val) => {
+  return (val, ...args) => {
     if (called < num) {
       vals = [...vals, val];
       if (++called === num) {
-        callback(vals);
+        callback(vals, ...args);
       }
     }
   }
@@ -112,7 +105,6 @@ const limit = (num, callback) => {
 export {
   render,
   random,
-  log,
   once,
   mod,
   limit,

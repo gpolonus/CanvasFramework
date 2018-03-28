@@ -1,47 +1,48 @@
-import SignIn from './SignIn';
 import Player from '../game/Player';
 import { mod } from '../functions';
 
-const getPlayersUrl = '';
+// const getPlayersUrl = '';
 
 class PlayerService {
-  constructor() {
+  constructor(playerData) {
     this.currentPlayerId = 0;
+    const sortedPlayers = playerData.sort(({ id: a }, { id: b }) => a < b ? -1 : 1);
+    this.setPlayers(sortedPlayers);
   }
 
-  async fetchPlayers() {
-    const localPlayers = await this.getLocalPlayers();
-    const remotePlayers = await this.getRemotePlayers();
-    this.setPlayers([...localPlayers, ...remotePlayers].sort(({id: a}, {id: b}) => a < b ? -1 : 1));
-  }
+  // async fetchPlayers() {
+  //   const localPlayers = await this.getLocalPlayers();
+  //   const remotePlayers = await this.getRemotePlayers();
+  //   this.setPlayers([...localPlayers, ...remotePlayers]
+  // }
 
-  getLocalPlayers() {
-    // const name = await(new SignIn()).getName();
-    return Promise.resolve([
-      {
-        name: 'Bob',
-        id: 0,
-        local: true
-      },
-      {
-        name: 'Bill',
-        id: 1,
-        local: true
-      }
-    ]);
-  }
+  // getLocalPlayers() {
+  //   // const name = await(new SignIn()).getName();
+  //   return Promise.resolve([
+  //     {
+  //       name: 'Bob',
+  //       id: 0,
+  //       local: true
+  //     },
+  //     {
+  //       name: 'Bill',
+  //       id: 1,
+  //       local: true
+  //     }
+  //   ]);
+  // }
 
-  getRemotePlayers() {
-    // return axios.get(getPlayersUrl);
-    return Promise.resolve([
-    ]);
-    //   {
-    //     name: 'Alice',
-    //     id: 2,
-    //     local: false
-    //   }
-    // ]);
-  }
+  // getRemotePlayers() {
+  //   // return axios.get(getPlayersUrl);
+  //   return Promise.resolve([
+  //   ]);
+  //   //   {
+  //   //     name: 'Alice',
+  //   //     id: 2,
+  //   //     local: false
+  //   //   }
+  //   // ]);
+  // }
 
   setPlayers(players) {
     const playerObjects = players.map((player) => new Player(player)); 

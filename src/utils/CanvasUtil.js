@@ -130,6 +130,7 @@ export default class CanvasUtil {
     let i = 1;
     Array(points.length - 1).fill(1).map(() => {
       ctx.lineTo(points[i].x, points[i++].y);
+      return null;
     });
     if(connect)
       ctx.lineTo(points[0].x, points[0].y);

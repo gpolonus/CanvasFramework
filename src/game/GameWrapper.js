@@ -1,7 +1,6 @@
 
 import { render, animateLine, p } from '../functions';
 import Game from './Game';
-import SignIn from '../objects/SignIn';
 
 const init = (er, statusCU, cu, du, ps) => {
   const game = new Game(ps);
@@ -37,10 +36,11 @@ const statusDraw = (cu, ps) => {
     // line spacing
     const ls = 10;
     cu.text(p.name + ': ' + p.points, 0, 2 * ls + i * th, th + "px Arial", "black");
+    return null;
   });
 };
 
-const startRender = (game, er, cu, du, ps) => {
+const startRender = (game, er, cu, du) => {
   render(() => {
     // always trigger events first
     er.triggerActions();
