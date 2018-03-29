@@ -28,11 +28,19 @@ export default {
   // adds a non-host to a room
   putInRoom: (roomId, localPlayers, rooms) => {
     if(!rooms[roomId]) return Promise.reject('BAD');
-    // const players = {...localPlayers, ...rooms[roomId].players};
     let i = Object.values(rooms[roomId].players).length;
-    const players = localPlayers.reduce((ac, next) => ({...ac, [i]: next}), rooms[roomId].players);
+    const players = Object.values(localPlayers).reduce((ac, next) => ({...ac, [i++]: next}), rooms[roomId].players);
     return new Promise(resolve => {
       database.ref(`rooms/${roomId}`).set({...rooms[roomId], players}, resolve);
+    });
+  },
+  // takes non-hosts from a room
+  takeFromRoom: (roomId, localPlayers, rooms) => {
+    if (!rooms[roomId]) return Promise.reject('BAD');
+    let i = Object.values(rooms[roomId].players).length;
+    const players = Object.values(localPlayers).reduce((ac, next) => ({ ...ac, [i]: next }), rooms[roomId].players);
+    return new Promise(resolve => {
+      database.ref(`rooms/${roomId}`).set({ ...rooms[roomId], players }, resolve);
     });
   },
   // start the game at the id with the players in it

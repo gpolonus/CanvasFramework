@@ -14,10 +14,11 @@ const initState = {
   formState: 'hosting',
   hosting: false,
   numPlayers: 1,
-  localPlayers: ['asdf'],
+  localPlayers: {0: ''},
+  playerEnteringId: 0,
   roomId: -1,
   ready: false,
-  rooms: 'empty'
+  rooms: null
 };
 
 const initActions = {
@@ -27,23 +28,25 @@ const initActions = {
   numPlayers: (e) => () => ({numPlayers: e.target.value}),
   setNumPlayers: () => () => ({formState: 'signin'}),
   changeName: (e) => (state) => {
-    const localPlayers = [...state.localPlayers];
-    localPlayers[state.localPlayers.length - 1] = e.target.value;
+    const localPlayers = {...state.localPlayers};
+    localPlayers[state.playerEnteringId] = e.target.value;
     return {localPlayers};
   },
   enterName: () => (state) => {
-    const localPlayers = [...state.localPlayers];
+    const localPlayers = {...state.localPlayers};
+    let playerEnteringId = state.playerEnteringId;
     let formState = 'signin';
-    if (state.numPlayers <= state.localPlayers.length) {
+    if (state.numPlayers === playerEnteringId + 1) {
       if(state.hosting) {
         formState = 'hostRoom';
       } else {
         formState = 'viewRooms';
       }
     } else {
-      localPlayers.push('');
+      localPlayers[++playerEnteringId] = '';
     }
     return {
+      playerEnteringId,
       localPlayers,
       formState
     };
@@ -69,12 +72,15 @@ const initActions = {
     console.log(rooms);
     return {rooms}
   },
-  setRoom: roomId => () => ({roomId: roomId, ready: true}),
+  setRoom: roomId => () => {
+    return ({roomId: roomId, ready: false});
+  },
   readyToggle: () => (state) => {
     const ready = !state.ready;
     if(ready) {
-      const players = [...state.rooms[state.roomId].players, ...state.localPlayers];
-      RoomService.putInRoom(state.roomId, players);
+      RoomService.putInRoom(state.roomId, state.localPlayers, state.rooms);
+    } else {
+      RoomService.takeFromRoom(state.roomId, state.localPlayers, state.rooms);
     }
     return {ready};
   },
@@ -118,26 +124,26 @@ const startForm = (state, actions) => {
     case 'signin':
       return (
         <Aux>
-          <h2>GOING TO LEARN TO WRITE YOUR NAME: Player {state.localPlayers.length}</h2>
+          <h2>GOING TO LEARN TO WRITE YOUR NAME: Player {Object.values(state.localPlayers).length}</h2>
           <div>
             <input
               class="signInInput"
               // onchange={actions.changeName}
               onkeyup={actions.changeName}
-              value={state.localPlayers[state.localPlayers.length - 1]}
+              value={state.localPlayers[Object.values(state.localPlayers).length - 1]}
             />
           </div>
           <div>
             <button
               class="button"
               onclick={actions.enterName}
-              disabled={!state.localPlayers[state.localPlayers.length - 1].length}
+              disabled={!state.localPlayers[Object.values(state.localPlayers).length - 1].length}
             >ENTER</button>
           </div>
         </Aux>
       );
     case 'hostRoom':
-      if (state.rooms === 'empty') {
+      if (state.rooms === null) {
         actions.fetchRoomData();
         return LoadingModalContent;
       } else if(!state.rooms[state.roomId]) {
@@ -158,25 +164,23 @@ const startForm = (state, actions) => {
         );
       }
     case 'viewRooms':
-      if (state.rooms === 'empty') {
+      if (state.rooms === null) {
         actions.fetchRoomData();
-        return LoadingModalContent;
-      } else if (!state.rooms[state.roomId]) {
         return LoadingModalContent;
       } else {
         return (
           <Aux>
             <h2>Open Rooms</h2>
             <div>
-              {state.rooms.length ?
-                state.rooms.map(room => (
+              {Object.values(state.rooms).length ?
+                Object.entries(state.rooms).map(([roomId, room]) => (
                   <div
-                    class={'room-row' + state.roomId === room.id ? ' room-selected' : '' }
-                    onclick={() => actions.setRoom(room.id)}
+                    class={'room-row' + (state.roomId === roomId ? ' room-selected' : '') }
+                    onclick={() => actions.setRoom(roomId)}
                   >
                     <span>
-                    {room.players.length > 0 ?
-                      room.players.join(', ') :
+                    {Object.values(room.players).length > 0 && !room.started ?
+                      Object.values(room.players).join(', ') :
                       'No players in this room'
                     }
                     </span>
@@ -204,9 +208,9 @@ const startForm = (state, actions) => {
 
 const init = (canvases, state) => {
   const playerData = Object.entries(state.rooms[state.roomId].players).map(([id, p]) => ({ name: p, id, local: false }));
-  [...state.localPlayers].map(p => {
-    const localplayer = playerData.find(({name: _p}) => p === _p && !_p.local);
-    localplayer.local = true;
+  Object.values(state.localPlayers).map(p => {
+    const localPlayer = playerData.find(({name: _p}) => p === _p && !_p.local);
+    localPlayer.local = true;
     return null;
   });
   const ps = new PlayerService(playerData);
@@ -290,7 +294,7 @@ const initView = (state, actions) => (
             {startForm(state, actions)}
           </div>
         </div>
-        <canvas key="2" oncreate={backgroundAnimate} onupdate={backgroundAnimate} onremove={stopRender}/>
+        {/* <canvas key="2" oncreate={backgroundAnimate} onupdate={backgroundAnimate} onremove={stopRender}/> */}
       </div>)
     }
   </div>

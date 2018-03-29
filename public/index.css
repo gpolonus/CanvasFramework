@@ -65,3 +65,13 @@ body {
 .modalContents .button:active {
   box-shadow: inherit;
 }
+
+.room-row {
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.room-selected {
+  border: 2px solid black;
+  border-radius: 10px
+}
