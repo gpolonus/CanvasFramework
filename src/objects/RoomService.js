@@ -34,7 +34,7 @@ export default {
       database.ref(`rooms/${roomId}`).set({...rooms[roomId], players}, resolve);
     });
   },
-  // takes non-hosts from a room
+  // TODO takes non-hosts from a room
   takeFromRoom: (roomId, localPlayers, rooms) => {
     if (!rooms[roomId]) return Promise.reject('BAD');
     let i = Object.values(rooms[roomId].players).length;

@@ -12,10 +12,10 @@ const init = (er, statusCU, cu, du, ps) => {
       startRender(game, er, cu, du, ps);
     },
     'over-start': () => {
-      drawStart(cu, true);
+      drawStart(cu, statusCU, true);
     },
     'out-start': () => {
-      drawStart(cu);
+      drawStart(cu, statusCU);
     }
   };
   er.setActions(triggers);
@@ -24,7 +24,7 @@ const init = (er, statusCU, cu, du, ps) => {
     'over': 'over-start',
     'out': 'out-start'
   }, true);
-  drawStart(cu);
+  drawStart(cu, statusCU);
 };
 
 const statusDraw = (cu, ps) => {
@@ -80,21 +80,12 @@ const startRender = (game, er, cu, du) => {
   });
 };
 
-// const drawStatus = () => {
-//   // draw status things about players and game control buttons
-//   ps.players.map((p, i) => {
-//     // text height
-//     const th = 25;
-//     // line spacing
-//     const ls = 10;
-//     cu.text(p.name + ': ' + p.points, 0, 2 * ls + i * th, th + "px Arial", "black");
-//   });
-// }
-
-const drawStart = (cu, over) => {
+const drawStart = (cu, statusCU, over) => {
   cu.background('grey');
   const { x, y, w, h } = buttonDims(cu);
   cu.rectangle(x, y, w, h, 'white');
+  const center = statusCU.center();
+  statusCU.text('START', center.x, center.y, '30px Arial', 'black');
   if (over) cu.box(x, y, w, h, 'black', 10);
 };
 

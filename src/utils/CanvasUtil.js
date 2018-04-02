@@ -162,4 +162,8 @@ export default class CanvasUtil {
     }
     return dims;
   }
+
+  center() {
+    return { x: parseInt(this.dims.width) / 2, y: parseInt(this.dims.height) / 2};
+  }
 }

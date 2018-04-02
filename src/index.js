@@ -294,37 +294,11 @@ const initView = (state, actions) => (
             {startForm(state, actions)}
           </div>
         </div>
-        {/* <canvas key="2" oncreate={backgroundAnimate} onupdate={backgroundAnimate} onremove={stopRender}/> */}
+        <canvas key="2" oncreate={backgroundAnimate} onupdate={backgroundAnimate} onremove={stopRender}/>
       </div>)
     }
   </div>
 );
 
 // app(state, actions, view, document.body);
-// false && app(initState, initActions, initView, document.body);
 app(initState, initActions, initView, document.body);
-
-
-
-
-
-
-
-// (async (rs) => {
-//   let rooms = await rs.getOpenRooms(data => {
-//     rooms = data;
-//     console.log(data);
-//   });
-//   await rs.createRoom(rs.getNewRoomName(rooms), {
-//     0: 'tim',
-//     1: 'bob',
-//     2: 'bill',
-//   });
-//   await rs.createRoom(rs.getNewRoomName(rooms), {
-//     0: 'tim',
-//     1: 'bob',
-//     2: 'bill',
-//   });
-//   await rs.putInRoom(0, { [Object.values(rooms[0].players).length]: `person ${Object.values(rooms[0].players).length}`}, rooms)
-//   await rs.startGame(0, rooms);
-// })(RoomService);
